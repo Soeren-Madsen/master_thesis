@@ -1,0 +1,4 @@
+[ 25%] [32m[1mLinking CXX executable /home/soren/master_thesis/devel/.private/eit_playground/lib/eit_playground/offb_node[0m
+[ 50%] [32m[1mLinking CXX executable /home/soren/master_thesis/devel/.private/eit_playground/lib/eit_playground/offb_node_square[0m
+[ 75%] Built target offb_node
+[100%] Built target offb_node_square

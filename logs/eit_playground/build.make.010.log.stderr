@@ -1,0 +1,39 @@
+[01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:22:56:[m[K [01;31m[Kerror: [m[Kexpected ‘[01m[K,[m[K’ or ‘[01m[K...[m[K’ before ‘[01m[K&[m[K’ token
+ void state_cb(const geometry_msgs::PoseStamped ConstPtr[01;31m[K&[m[K msg){
+                                                        [01;31m[K^[m[K
+[01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:[m[K In function ‘[01m[Kvoid state_cb(geometry_msgs::PoseStamped)[m[K’:
+[01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:23:21:[m[K [01;31m[Kerror: [m[K‘[01m[Kmsg[m[K’ was not declared in this scope
+     current_pose = *[01;31m[Kmsg[m[K;
+                     [01;31m[K^~~[m[K
+In file included from [01m[K/opt/ros/melodic/include/ros/ros.h:40:0[m[K,
+                 from [01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:10[m[K:
+[01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:[m[K In function ‘[01m[Kint main(int, char**)[m[K’:
+[01m[K/opt/ros/melodic/include/ros/console.h:381:3:[m[K [01;31m[Kerror: [m[Kexpected primary-expression before ‘[01m[Kdo[m[K’
+   [01;31m[Kd[m[Ko \
+   [01;31m[K^[m[K
+[01m[K/opt/ros/melodic/include/ros/console.h:572:35:[m[K [01;36m[Knote: [m[Kin expansion of macro ‘[01m[KROS_LOG_COND[m[K’
+ #define ROS_LOG(level, name, ...) [01;36m[KROS_LOG_COND[m[K(true, level, name, __VA_ARGS__)
+                                   [01;36m[K^~~~~~~~~~~~[m[K
+[01m[K/opt/ros/melodic/include/rosconsole/macros_generated.h:110:23:[m[K [01;36m[Knote: [m[Kin expansion of macro ‘[01m[KROS_LOG[m[K’
+ #define ROS_INFO(...) [01;36m[KROS_LOG[m[K(::ros::console::levels::Info, ROSCONSOLE_DEFAULT_NAME, __VA_ARGS__)
+                       [01;36m[K^~~~~~~[m[K
+[01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:112:22:[m[K [01;36m[Knote: [m[Kin expansion of macro ‘[01m[KROS_INFO[m[K’
+         std::cout << [01;36m[KR[m[KOS_INFO(pose.pose_sub.position.x) << endl;
+                      [01;36m[K^[m[K
+[01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:112:57:[m[K [01;31m[Kerror: [m[Kexpected primary-expression before ‘[01m[K<<[m[K’ token
+         std::cout << ROS_INFO(pose.pose_sub.position.x) [01;31m[K<<[m[K endl;
+                                                         [01;31m[K^~[m[K
+[01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:112:60:[m[K [01;31m[Kerror: [m[K‘[01m[Kendl[m[K’ was not declared in this scope
+         std::cout << ROS_INFO(pose.pose_sub.position.x) << [01;31m[Kendl[m[K;
+                                                            [01;31m[K^~~~[m[K
+[01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:112:60:[m[K [01;36m[Knote: [m[Ksuggested alternative:
+In file included from [01m[K/usr/include/c++/7/iostream:39:0[m[K,
+                 from [01m[K/opt/ros/melodic/include/ros/time.h:54[m[K,
+                 from [01m[K/opt/ros/melodic/include/ros/ros.h:38[m[K,
+                 from [01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:10[m[K:
+[01m[K/usr/include/c++/7/ostream:590:5:[m[K [01;36m[Knote: [m[K  ‘[01m[Kstd::endl[m[K’
+     [01;36m[Kendl[m[K(basic_ostream<_CharT, _Traits>& __os)
+     [01;36m[K^~~~[m[K
+make[2]: *** [CMakeFiles/offb_node_square.dir/src/offb_node_square.cpp.o] Error 1
+make[1]: *** [CMakeFiles/offb_node_square.dir/all] Error 2
+make: *** [all] Error 2

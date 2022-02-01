@@ -1,0 +1,8 @@
+prefix=/home/soren/master_thesis/install
+
+Name: eit_playground
+Description: Description of eit_playground
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

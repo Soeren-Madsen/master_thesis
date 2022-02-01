@@ -1,0 +1,8 @@
+prefix=/home/soren/master_thesis/devel/.private/asv_wave_sim_gazebo_plugins
+
+Name: asv_wave_sim_gazebo_plugins
+Description: Description of asv_wave_sim_gazebo_plugins
+Version: 0.1.2
+Cflags: -I/home/soren/master_thesis/src/asv_wave_sim/asv_wave_sim_gazebo_plugins/include
+Libs: -L${prefix}/lib -lHydrodynamics -lHydrodynamicsPlugin -lWavefieldModelPlugin -lWavefieldVisualPlugin
+Requires: gazebo_ros

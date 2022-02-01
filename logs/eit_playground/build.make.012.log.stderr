@@ -1,0 +1,31 @@
+[01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:22:56:[m[K [01;31m[Kerror: [m[Kexpected ‘[01m[K,[m[K’ or ‘[01m[K...[m[K’ before ‘[01m[K&[m[K’ token
+ void state_cb(const geometry_msgs::PoseStamped ConstPtr[01;31m[K&[m[K msg){
+                                                        [01;31m[K^[m[K
+[01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:[m[K In function ‘[01m[Kvoid state_cb(geometry_msgs::PoseStamped)[m[K’:
+[01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:23:21:[m[K [01;31m[Kerror: [m[K‘[01m[Kmsg[m[K’ was not declared in this scope
+     current_pose = *[01;31m[Kmsg[m[K;
+                     [01;31m[K^~~[m[K
+In file included from [01m[K/opt/ros/melodic/include/ros/ros.h:40:0[m[K,
+                 from [01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:10[m[K:
+[01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:[m[K In function ‘[01m[Kint main(int, char**)[m[K’:
+[01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:112:23:[m[K [01;31m[Kerror: [m[K‘[01m[Kgeometry_msgs::PoseStamped {aka struct geometry_msgs::PoseStamped_<std::allocator<void> >}[m[K’ has no member named ‘[01m[Kpose_sub[m[K’; did you mean ‘[01m[Kpose[m[K’?
+         ROS_INFO(pose.[01;31m[Kp[m[Kose_sub.position.x);
+                       [01;31m[K^[m[K
+[01m[K/opt/ros/melodic/include/ros/console.h:348:165:[m[K [01;36m[Knote: [m[Kin definition of macro ‘[01m[KROSCONSOLE_PRINT_AT_LOCATION_WITH_FILTER[m[K’
+     ::ros::console::print(filter, __rosconsole_define_location__loc.logger_, __rosconsole_define_location__loc.level_, __FILE__, __LINE__, __ROSCONSOLE_FUNCTION__, [01;36m[K__VA_ARGS__[m[K)
+                                                                                                                                                                     [01;36m[K^~~~~~~~~~~[m[K
+[01m[K/opt/ros/melodic/include/ros/console.h:387:7:[m[K [01;36m[Knote: [m[Kin expansion of macro ‘[01m[KROSCONSOLE_PRINT_AT_LOCATION[m[K’
+       [01;36m[KROSCONSOLE_PRINT_AT_LOCATION[m[K(__VA_ARGS__); \
+       [01;36m[K^~~~~~~~~~~~~~~~~~~~~~~~~~~~[m[K
+[01m[K/opt/ros/melodic/include/ros/console.h:572:35:[m[K [01;36m[Knote: [m[Kin expansion of macro ‘[01m[KROS_LOG_COND[m[K’
+ #define ROS_LOG(level, name, ...) [01;36m[KROS_LOG_COND[m[K(true, level, name, __VA_ARGS__)
+                                   [01;36m[K^~~~~~~~~~~~[m[K
+[01m[K/opt/ros/melodic/include/rosconsole/macros_generated.h:110:23:[m[K [01;36m[Knote: [m[Kin expansion of macro ‘[01m[KROS_LOG[m[K’
+ #define ROS_INFO(...) [01;36m[KROS_LOG[m[K(::ros::console::levels::Info, ROSCONSOLE_DEFAULT_NAME, __VA_ARGS__)
+                       [01;36m[K^~~~~~~[m[K
+[01m[K/home/soren/eit_ws/src/eit_playground/src/offb_node_square.cpp:112:9:[m[K [01;36m[Knote: [m[Kin expansion of macro ‘[01m[KROS_INFO[m[K’
+         [01;36m[KR[m[KOS_INFO(pose.pose_sub.position.x);
+         [01;36m[K^[m[K
+make[2]: *** [CMakeFiles/offb_node_square.dir/src/offb_node_square.cpp.o] Error 1
+make[1]: *** [CMakeFiles/offb_node_square.dir/all] Error 2
+make: *** [all] Error 2

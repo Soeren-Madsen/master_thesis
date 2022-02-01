@@ -1,0 +1,13 @@
+Symlinking /home/soren/master_thesis_new/devel/share/asv_wave_sim_gazebo_plugins/cmake/asv_wave_sim_gazebo_pluginsConfig.cmake
+Symlinking /home/soren/master_thesis_new/devel/share/asv_wave_sim_gazebo_plugins/cmake/asv_wave_sim_gazebo_pluginsConfig-version.cmake
+Symlinking /home/soren/master_thesis_new/devel/lib/libWavefieldVisualPlugin.so
+Symlinking /home/soren/master_thesis_new/devel/lib/libHydrodynamics.so
+Symlinking /home/soren/master_thesis_new/devel/lib/libHydrodynamicsPlugin.so
+Symlinking /home/soren/master_thesis_new/devel/lib/libWavefieldModelPlugin.so
+Symlinking /home/soren/master_thesis_new/devel/lib/asv_wave_sim_gazebo_plugins/HydrodynamicsMsgPublisher
+Symlinking /home/soren/master_thesis_new/devel/lib/asv_wave_sim_gazebo_plugins/TestRunner
+Symlinking /home/soren/master_thesis_new/devel/lib/asv_wave_sim_gazebo_plugins/WaveMsgPublisher
+Symlinking /home/soren/master_thesis_new/devel/lib/asv_wave_sim_gazebo_plugins/GzTestRunner
+Symlinking /home/soren/master_thesis_new/devel/lib/asv_wave_sim_gazebo_plugins/WaveMsgSubscriber
+Symlinking /home/soren/master_thesis_new/devel/lib/asv_wave_sim_gazebo_plugins/HydrodynamicsMsgSubscriber
+Symlinking /home/soren/master_thesis_new/devel/lib/pkgconfig/asv_wave_sim_gazebo_plugins.pc

@@ -1,0 +1,1 @@
+/home/soren/eit_ws/devel/.private/eit_playground/share/eit_playground/cmake/eit_playgroundConfig.cmake

@@ -1,0 +1,8 @@
+prefix=/home/soren/master_thesis/devel/.private/eit
+
+Name: eit
+Description: Description of eit
+Version: 0.0.0
+Cflags: -I/home/soren/master_thesis/src/eit/include
+Libs: -L${prefix}/lib 
+Requires: 

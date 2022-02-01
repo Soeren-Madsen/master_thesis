@@ -1,0 +1,1 @@
+/home/soren/master_thesis_new/devel/.private/catkin_tools_prebuild/setup.bash

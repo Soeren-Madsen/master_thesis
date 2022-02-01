@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/soren/master_thesis/devel/.private/asv_wave_sim_gazebo_plugins/setup.sh

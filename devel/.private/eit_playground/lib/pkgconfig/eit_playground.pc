@@ -1,0 +1,8 @@
+prefix=/home/soren/master_thesis/devel/.private/eit_playground
+
+Name: eit_playground
+Description: Description of eit_playground
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

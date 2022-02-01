@@ -1,0 +1,1 @@
+/home/soren/eit_ws/devel/.private/eit/share/eit/cmake/eitConfig.cmake

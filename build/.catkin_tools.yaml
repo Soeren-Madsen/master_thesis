@@ -1,0 +1,6 @@
+devel_space: /home/soren/master_thesis/devel
+install: false
+install_space: /home/soren/master_thesis/install
+profile: default
+source_space: /home/soren/master_thesis/src
+workspace: /home/soren/master_thesis
