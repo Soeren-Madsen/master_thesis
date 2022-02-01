@@ -1,0 +1,284 @@
+<!DOCTYPE HTML>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <script src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+    <script src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+        font-family: Calibri,Candara,Segoe,Segoe UI,Optima,Arial,sans-serif;
+      }
+
+      html, body {
+        height: 100%;
+      }
+
+      .table {
+        display: table;
+      }
+
+      .row {
+        display: table-row;
+      }
+
+      .col {
+        display: table-column;
+      }
+
+      .cell {
+        display: table-cell;
+      }
+
+      #wrapper {
+        width: 100%;
+        height: 100%;
+        display: table;
+      }
+
+      #map {
+        width: 80%;
+      }
+
+      #interface_wrapper {
+        text-align: center;
+        display: table;
+        width: 100%;
+      }
+
+      #interface_wrapper > div {
+        background-color: #EEE;
+        margin: 10px;
+        padding: 5px;
+      }
+
+      /* Tables */
+      #interface_wrapper table {
+        width: 100%;
+        margin: 10px;
+      }
+
+      #interface_wrapper table tr > td:first-of-type {
+        width: 30%;
+        text-align: right;
+      }
+
+      #interface_wrapper button {
+        width: 100%;
+        font-size: 20px;
+      }
+
+      #rgbData {
+        width: 100%;
+      }
+
+      /* Fonts */
+      h1 {
+        font-size: 30px;
+        text-align: left;
+        margin: 20px auto 20px 20px;
+      }
+
+      h2 {
+        font-size: 20px;
+        text-align: left;
+        margin: 5px auto 5px 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="table" id="wrapper">
+      <div class="row">
+        <div class="cell" id="map"></div>
+        <div class="cell">
+          <div id="interface_wrapper">
+            <h1>AED Drone HQ</h1>
+            <div id="boxDrone">
+              <h2>Drone State</h2>
+              <table>
+                <tr>
+                  <td>Lat/Lon</td>
+                  <td id="droneLat">---</td>
+                  <td id="droneLon">---</td>
+                </tr>
+                <tr>
+                  <td>AMSL/Local</td>
+                  <td id="droneAltAMSL">---</td>
+                  <td id="droneAltLocal">---</td>
+                </tr>
+                <tr>
+                  <td>State</td>
+                  <td colspan="2" id="droneState">---</td>
+                </tr>
+              </table>
+            </div>
+            <div id="boxTarget">
+              <h2>Target</h2>
+              <table>
+                <tr>
+                  <td>Lat/Lon</td>
+                  <td id="targetLat">---</td>
+                  <td id="targetLon">---</td>
+                </tr>
+              </table>
+              <button id="targetButton" disabled="true">Go To Target</button>
+            </div>
+          </div>
+          <img id="rgbData" />
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript" type="text/javascript">
+      // initialize Leaflet
+      var map = L.map('map').setView({lon: 10.324096, lat: 55.471991}, 18);
+			L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
+        maxZoom: 20,
+        subdomains:['mt0','mt1','mt2','mt3']
+      }).addTo(map);
+
+      // show the scale bar on the lower left corner
+      L.control.scale({imperial: false, metric: true}).addTo(map);
+
+      // Markers
+      var droneIcon = L.icon({
+        iconUrl: 'AED_Drone.png',
+        iconSize: [96, 48],
+        iconAnchor:   [48, 24]
+      });
+      var drone = L.marker([55.471994, 10.32290], {
+        icon: droneIcon
+      }).addTo(map);
+			var circTar = L.circle([55.471994, 10.32275], {
+        color: 'red',
+			  fillColor: 'red',
+			  fillOpacity: 0.5,
+			  radius: 4
+			}).addTo(map);
+			var circStart = L.circle([55.471994, 10.32275], {
+        color: 'green',
+			  fillColor: 'green',
+			  fillOpacity: 0.5,
+			  radius: 4
+			}).addTo(map);
+      var trace = L.polyline([], {
+        color: 'red',
+        opacity: 0.8,
+        weight: 5
+      }).addTo(map);
+
+      // On map click
+      var tarLat;
+      var tarLon;
+      function onMapClick(e) {
+        tarLat = e.latlng.lat;
+        tarLon = e.latlng.lng;
+
+        circTar.setLatLng(e.latlng);
+        
+        document.getElementById("targetLat").innerHTML = tarLat.toString().slice(0, 7);
+        document.getElementById("targetLon").innerHTML = tarLon.toString().slice(0, 7);
+        document.getElementById("targetButton").disabled = false; 
+      }
+      map.on('click', onMapClick);
+
+      // ROS stuff
+      var ros = new ROSLIB.Ros({url: 'ws://localhost:9090'});
+      ros.on('connection', function(){console.log('Connected to websocket server.');});
+      ros.on('error', function(error){console.log('Error connecting to websocket server: ', error);});
+      ros.on('close', function(){console.log('Connection to websocket server closed.');});
+
+      // Subscribers
+      var globalposTopic = new ROSLIB.Topic({
+        ros: ros,
+        name: '/mavros/global_position/global',
+        messageType: 'sensor_msgs/NavSatFix',
+        throttle_rate: 200
+      });
+      globalposTopic.subscribe(function(msg) {
+        console.log('Received message on ' + globalposTopic.name);
+        var lat = msg.latitude;
+        var lon = msg.longitude;
+        document.getElementById('droneLat').innerHTML = lat.toString().slice(0, 7);
+        document.getElementById('droneLon').innerHTML = lon.toString().slice(0, 7);
+        var latlon = new L.LatLng(lat, lon);
+        drone.setLatLng(latlon);
+        trace.addLatLng(latlon);
+        map.setView({lon: lon, lat: lat})
+      });
+
+      var stateTopic = new ROSLIB.Topic({
+        ros: ros,
+        name: '/mavros/state',
+        messageType: 'mavros_msgs/State',
+        throttle_rate: 1000
+      });
+      stateTopic.subscribe(function(msg) {
+        console.log('Received message on ' + stateTopic.name);
+        document.getElementById('droneState').innerHTML = msg.mode;
+      });
+
+      var altitudeTopic = new ROSLIB.Topic({
+        ros: ros,
+        name: '/mavros/altitude',
+        messageType: 'mavros_msgs/Altitude',
+        throttle_rate: 1000
+      });
+      altitudeTopic.subscribe(function(msg) {
+        console.log('Received message on ' + altitudeTopic.name);
+        document.getElementById('droneAltAMSL').innerHTML = msg.amsl.toString().slice(0, 7);
+        document.getElementById('droneAltLocal').innerHTML = msg.local.toString().slice(0, 7);
+      });
+
+      var imgTopic = new ROSLIB.Topic({
+        ros: ros,
+        name: '/rgb/data/compressed',
+        messageType: 'sensor_msgs/CompressedImage',
+        throttle_rate: 200
+      });
+      imgTopic.subscribe(function(msg){
+        var data = msg.data;
+        console.log('Received message on ' + imgTopic.name);
+        document.getElementById('rgbData').setAttribute('src', "data:image/jpeg;base64," + data);
+      });
+
+      // Publishers
+      var targetTopic = new ROSLIB.Topic({
+        ros: ros,
+        name: '/gui/target',
+        messageType: 'geographic_msgs/GeoPoseStamped'
+      });
+
+      // Send target coordinates
+      document.getElementById("targetButton").onclick = function(){
+        circStart.setLatLng(drone.getLatLng());
+        trace.setLatLngs([drone.getLatLng()]);
+        console.log(tarLat, tarLon);
+        var msg = new ROSLIB.Message({
+          header: {seq: 0, stamp: {secs: 0, nsecs: 0}, frame_id: ''},
+          pose: {
+            position: {
+              latitude: tarLat,
+              longitude: tarLon,
+              altitude: 30
+            },
+            orientation: {
+              x: 0.0,
+              y: 0.0,
+              z: 0.0,
+              w: 1.0
+            }
+          }
+        });
+        targetTopic.publish(msg);
+      };
+    </script>
+  </body>
+</html>
