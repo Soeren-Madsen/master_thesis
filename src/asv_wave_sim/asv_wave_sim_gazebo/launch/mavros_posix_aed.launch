@@ -11,7 +11,7 @@
     <!-- vehicle pose -->
     <arg name="x" default="50"/>
     <arg name="y" default="0"/>
-    <arg name="z" default="1.5"/>
+    <arg name="z" default="6.5"/>
     <arg name="R" default="0"/>
     <arg name="P" default="0"/>
     <arg name="Y" default="0"/>
