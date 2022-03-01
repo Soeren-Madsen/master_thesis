@@ -1,8 +1,0 @@
-#!/bin/sh
-#
-# @name SDU Drone for AED Delivery
-#
-# @type Hexarotor x
-#
-
-. ${R}etc/init.d-posix/airframes/6014_sdu_drone

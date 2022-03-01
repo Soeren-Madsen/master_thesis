@@ -1,1 +1,1 @@
-/home/soren/master_thesis_new/devel/.private/asv_wave_sim_gazebo_plugins/share/asv_wave_sim_gazebo_plugins/cmake/asv_wave_sim_gazebo_pluginsConfig.cmake
+/home/soren/master_thesis/devel/.private/asv_wave_sim_gazebo_plugins/share/asv_wave_sim_gazebo_plugins/cmake/asv_wave_sim_gazebo_pluginsConfig.cmake

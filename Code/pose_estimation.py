@@ -9,7 +9,7 @@ import math # Math library
 import time
 
 # Side length of the ArUco marker in meters 
-aruco_marker_side_length = 0.096
+aruco_marker_side_length = 0.092
  
 # Calibration parameters yaml file
 camera_calibration_parameters_filename = 'calibration_chessboard.yaml'
@@ -67,7 +67,7 @@ def main():
     if marker_ids is not None:
       # Draw a square around detected markers in the video frame
       cv2.aruco.drawDetectedMarkers(frame, corners, marker_ids)
-       
+      print(corners)
       # Get the rotation and translation vectors
       #print(dst)
       rvecs, tvecs = cv2.aruco.estimatePoseSingleMarkers(
@@ -118,7 +118,7 @@ def main():
         #print("transform_translation_y: {}".format(transform_translation_y))
         #print("transform_translation_z: {}".format(transform_translation_z))
         #print("roll_x: {}".format(roll_x))
-        print("pitch_y: {}".format(pitch_y))
+        #print("pitch_y: {}".format(pitch_y))
         #print("yaw_z: {}".format(yaw_z))
         #print("quaternion 1: {}".format(quat[0]))
         #print("quaternion 2: {}".format(quat[1]))

@@ -18,8 +18,9 @@ then
 else
 	: # Argument was not given
 	find ~/PX4-Autopilot/ -name "*_aed*" -delete
+	find ~/PX4-Autopilot/ -name "*sdu_master*" -delete
 	find ~/PX4-Autopilot/ -name "*cylinder*" -delete
 	echo "Symlinking.."
-	ln -s /home/$USER/master_thesis_new/src/eit/init.d-posix/* /home/$USER/PX4-Autopilot/ROMFS/px4fmu_common/init.d-posix/airframes/
-	ln -s /home/$USER/master_thesis_new/src/eit/models/* /home/$USER/PX4-Autopilot/Tools/sitl_gazebo/models/
+	ln -s /home/$USER/master_thesis/src/eit/init.d-posix/* /home/$USER/PX4-Autopilot/ROMFS/px4fmu_common/init.d-posix/airframes/
+	ln -s /home/$USER/master_thesis/src/eit/models/* /home/$USER/PX4-Autopilot/Tools/sitl_gazebo/models/
 fi

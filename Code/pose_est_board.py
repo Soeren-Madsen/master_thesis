@@ -63,8 +63,8 @@ def main():
   # Load the ArUco dictionary
   arucoDict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
   arucoParams = cv2.aruco.DetectorParameters_create() 
-  arucoParams.cornerRefinementMethod = cv2.aruco.CORNER_REFINE_SUBPIX
   board = cv2.aruco.GridBoard_create(3, 3, aruco_marker_side_length, aruco_marker_space, arucoDict)
+  print(board.objPoints)
   rvecs = None
   tvecs = None
   # Start the video stream

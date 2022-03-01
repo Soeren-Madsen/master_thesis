@@ -18,7 +18,7 @@
 
     <!-- vehicle model and world -->
     <arg name="est" default="ekf2"/>
-    <arg name="vehicle" default="sdu_aed"/>
+    <arg name="vehicle" default="sdu_master"/>
     <arg name="env" default="ocean"/>
     <arg name="world" default="$(find asv_wave_sim_gazebo)/worlds/$(arg env).world"/>
     <arg name="sdf" default="$(find asv_wave_sim_gazebo)/models/$(arg vehicle)/$(arg vehicle).sdf"/>
