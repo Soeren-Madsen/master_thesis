@@ -1,17 +1,12 @@
 <?xml version="1.0"?>
 <launch>
 
-    <remap from="/camera/depth/color/points"   to="/pcl"/>
-    <remap from="/camera/depth/camera_info"    to="/depth/info"/>
-    <remap from="/camera/depth/image_rect_raw" to="/depth/data"/>
-    <remap from="/camera/color/camera_info"    to="/rgb/info"/>
-    <remap from="/camera/color/image_raw"      to="/rgb/data"/>
     <!-- Posix SITL environment launch script -->
     <!-- launches PX4 SITL, Gazebo environment, and spawns vehicle -->
     <!-- vehicle pose -->
     <arg name="x" default="50"/>
     <arg name="y" default="0"/>
-    <arg name="z" default="6.5"/>
+    <arg name="z" default="7.5"/>
     <arg name="R" default="0"/>
     <arg name="P" default="0"/>
     <arg name="Y" default="0"/>
@@ -19,7 +14,7 @@
     <!-- vehicle model and world -->
     <arg name="est" default="ekf2"/>
     <arg name="vehicle" default="sdu_master"/>
-    <arg name="env" default="ocean"/>
+    <arg name="env" default="ocean"/> <!--ocean-->
     <arg name="world" default="$(find asv_wave_sim_gazebo)/worlds/$(arg env).world"/>
     <arg name="sdf" default="$(find asv_wave_sim_gazebo)/models/$(arg vehicle)/$(arg vehicle).sdf"/>
     <env name="PX4_SIM_MODEL" value="$(arg vehicle)" />

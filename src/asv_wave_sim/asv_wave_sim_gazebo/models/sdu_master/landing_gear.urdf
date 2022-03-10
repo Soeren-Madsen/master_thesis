@@ -1,0 +1,52 @@
+<?xml version='1.0'?>
+<robot name="test_robot">
+   <link name="base">
+    <inertial>
+      <mass value="0.1"/>
+      <origin xyz="0 0 8" rpy="0 0 0"/>
+      <inertia ixx="0.00762625" ixy="0" ixz="0" iyy="0.00762625" iyz="0" izz="0.01369"/>
+    </inertial>
+    <collision name="sdu_drone_base_link_inertia_collision">
+      <origin xyz="0     0     0.8225" rpy="0 0 0"/>
+      <geometry>
+	<box>
+          <size>0.1 0.1 0.1</size>
+        </box>
+      </geometry>
+    </collision>
+    <visual name="sdu_drone_base_link_inertia_visual">
+      <origin xyz="0    0    0.825" rpy="0 0 0"/>
+      <geometry>
+        <box>
+          <size>0.1 0.1 0.1</size>
+        </box>
+      </geometry>
+    </visual>
+  </link>
+<!--
+   <link name="link2" />
+   <link name="link3" />
+   <link name="link4" />
+ 
+   <joint name="joint1" type="fixed">
+     <parent link="link1"/>
+     <child link="link2"/>
+     <origin xyz="5 3 0" rpy="0 0 0" />
+     <axis xyz="-0.9 0.15 0" />
+   </joint>
+ 
+   <joint name="joint2" type="fixed">
+     <parent link="link1"/>
+     <child link="link3"/>
+     <origin xyz="-2 5 0" rpy="0 0 1.57" />
+     <axis xyz="-0.707 0.707 0" />
+   </joint>
+ 
+   <joint name="joint3" type="fixed">
+     <parent link="link3"/>
+     <child link="link4"/>
+     <origin xyz="5 0 0" rpy="0 0 -1.57" />
+     <axis xyz="0.707 -0.707 0" />
+   </joint>
+-->
+ </robot>
