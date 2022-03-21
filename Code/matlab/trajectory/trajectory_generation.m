@@ -4,11 +4,11 @@ format compact;
 %General parameters:
 t0=0;
 freq = 1;
-A = 0.5;
+A = 0.3;
 freq2 = 2;
-A2 = 1;
+A2 = 0.2;
 freq3 = 0.5;
-A3 = 2;
+A3 = 0.5;
 
 %Drone parameters:
 z_t0 = 10;
@@ -19,7 +19,7 @@ zd_hat = zd(t0,freq, A) + zd(t0,freq2, A2) + zd(t0,freq3, A3);
 zd_dot_hat = zd_dot(t0,freq, A) + zd_dot(t0,freq2, A2) + zd_dot(t0,freq3, A3);
 
 %Trajectory time calculation:
-zrmax_ddot = 15;
+zrmax_ddot = 5;
 zrmax_dot = 2;
 za = z_t0 - zd_hat;
 za_dot = z_dot_t0 - (zd_dot(t0,freq, A) + zd_dot(t0,freq2, A2) + zd_dot(t0,freq3, A3));
@@ -28,14 +28,14 @@ syms tau;
 
 %calculation loop:
 t = t0;
-dt = 0.02;
+dt = 0.05;
 z_ref = z_t0;
 zd_vec = zd_hat;
 za_ddot_plot = 0;
 za_dot_plot = 0;
 za_plot = 0;
 t_plot = t;
-while t < 20
+while t < 12
     zd_d_tau = zd_dot(tau,freq,A) + zd_dot(tau,freq2,A2) + zd_dot(tau,freq3,A3);
     zd_d_t = zd_dot(t,freq,A) + zd_dot(t,freq2,A2) + zd_dot(t,freq3,A3);
     
@@ -50,7 +50,7 @@ while t < 20
     
     zd_dd = zd_ddot(t,freq,A) + zd_ddot(t,freq2,A2) + zd_ddot(t,freq3,A3);
     
-    if za_tau <= 0.1 %Break
+    if za_tau <= 0 %Break
         za_ddot =  zrmax_ddot - zd_dd;
     elseif za_tau > 0
         if za_dot <= -zrmax_dot - zd_d_t
