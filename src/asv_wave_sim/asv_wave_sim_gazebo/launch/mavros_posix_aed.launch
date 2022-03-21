@@ -13,11 +13,11 @@
 
     <!-- vehicle model and world -->
     <arg name="est" default="ekf2"/>
-    <arg name="vehicle" default="convecdro"/> <!--sdu_master-->
+    <arg name="vehicle" default="sdu_master"/> <!--sdu_master-->
     <arg name="env" default="ocean"/> <!--ocean-->
     <arg name="world" default="$(find asv_wave_sim_gazebo)/worlds/$(arg env).world"/>
-    <!--arg name="sdf" default="$(find asv_wave_sim_gazebo)/models/$(arg vehicle)/$(arg vehicle).sdf"/-->
-    <arg name="urdf" default="$(find asv_wave_sim_gazebo)/models/$(arg vehicle)/$(arg vehicle).urdf"/>
+    <arg name="sdf" default="$(find asv_wave_sim_gazebo)/models/$(arg vehicle)/$(arg vehicle).sdf"/>
+    <!--arg name="urdf" default="$(find asv_wave_sim_gazebo)/models/$(arg vehicle)/$(arg vehicle).urdf"/-->
     <env name="PX4_SIM_MODEL" value="$(arg vehicle)" />
     <env name="PX4_ESTIMATOR" value="$(arg est)" />
 
@@ -49,8 +49,8 @@
         <arg name="respawn_gazebo" value="$(arg respawn_gazebo)"/>
     </include>
     <!-- gazebo model -->
-    <!--node name="$(anon vehicle_spawn)" pkg="gazebo_ros" type="spawn_model" output="screen" args="-sdf -file $(arg sdf) -model $(arg vehicle) -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)"/-->
-    <node name="$(anon vehicle_spawn)" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -file $(arg urdf) -model $(arg vehicle) -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)"/>
+    <node name="$(anon vehicle_spawn)" pkg="gazebo_ros" type="spawn_model" output="screen" args="-sdf -file $(arg sdf) -model $(arg vehicle) -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)"/>
+    <!--node name="$(anon vehicle_spawn)" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -file $(arg urdf) -model $(arg vehicle) -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)"/-->
     <!-- MAVROS -->
     <include file="$(find mavros)/launch/px4.launch">
         <!-- GCS link is provided by SITL -->

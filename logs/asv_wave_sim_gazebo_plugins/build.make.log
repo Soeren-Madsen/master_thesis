@@ -1,13 +1,10 @@
 [ 36%] Built target Hydrodynamics
-[35m[1mScanning dependencies of target HydrodynamicsPlugin[0m
-[ 42%] Built target WaveMsgSubscriber
-[ 48%] Built target HydrodynamicsMsgSubscriber
-[ 54%] Built target WavefieldModelPlugin
-[ 60%] Built target HydrodynamicsMsgPublisher
-[ 72%] Built target TestRunner
-[ 78%] Built target WaveMsgPublisher
-[ 84%] Built target WavefieldVisualPlugin
-[ 87%] [32mBuilding CXX object CMakeFiles/HydrodynamicsPlugin.dir/src/HydrodynamicsPlugin.cc.o[0m
-[ 96%] Built target GzTestRunner
-[100%] [32m[1mLinking CXX shared library /home/soren/master_thesis/devel/.private/asv_wave_sim_gazebo_plugins/lib/libHydrodynamicsPlugin.so[0m
-[100%] Built target HydrodynamicsPlugin
+[ 48%] Built target TestRunner
+[ 54%] Built target WaveMsgPublisher
+[ 60%] Built target HydrodynamicsPlugin
+[ 66%] Built target WaveMsgSubscriber
+[ 72%] Built target HydrodynamicsMsgSubscriber
+[ 78%] Built target HydrodynamicsMsgPublisher
+[ 84%] Built target WavefieldModelPlugin
+[ 90%] Built target WavefieldVisualPlugin
+[100%] Built target GzTestRunner
