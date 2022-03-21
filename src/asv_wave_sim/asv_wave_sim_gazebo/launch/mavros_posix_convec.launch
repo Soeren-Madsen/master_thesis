@@ -6,7 +6,7 @@
     <!-- vehicle pose -->
     <arg name="x" default="50"/>
     <arg name="y" default="0"/>
-    <arg name="z" default="7.5"/>
+    <arg name="z" default="7000.5"/>
     <arg name="R" default="0"/>
     <arg name="P" default="0"/>
     <arg name="Y" default="0"/>
@@ -16,8 +16,7 @@
     <arg name="vehicle" default="convecdro"/> <!--sdu_master-->
     <arg name="env" default="ocean"/> <!--ocean-->
     <arg name="world" default="$(find asv_wave_sim_gazebo)/worlds/$(arg env).world"/>
-    <!--arg name="sdf" default="$(find asv_wave_sim_gazebo)/models/$(arg vehicle)/$(arg vehicle).sdf"/-->
-    <arg name="urdf" default="$(find asv_wave_sim_gazebo)/models/$(arg vehicle)/$(arg vehicle).urdf"/>
+    <arg name="model" default="$(find asv_wave_sim_gazebo)models/convecdro/convecdro_base.xacro"/>
     <env name="PX4_SIM_MODEL" value="$(arg vehicle)" />
     <env name="PX4_ESTIMATOR" value="$(arg est)" />
 
@@ -33,6 +32,7 @@
     <!-- MAVROS configs -->
     <arg name="fcu_url" default="udp://:14540@localhost:14557"/>
     <arg name="respawn_mavros" default="false"/>
+    <arg name="enable_mavlink_interface" default="true"/>
     <!-- PX4 SITL -->
     <arg unless="$(arg interactive)" name="px4_command_arg1" value="-d"/>
     <arg     if="$(arg interactive)" name="px4_command_arg1" value=""/>
@@ -50,7 +50,14 @@
     </include>
     <!-- gazebo model -->
     <!--node name="$(anon vehicle_spawn)" pkg="gazebo_ros" type="spawn_model" output="screen" args="-sdf -file $(arg sdf) -model $(arg vehicle) -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)"/-->
-    <node name="$(anon vehicle_spawn)" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -file $(arg urdf) -model $(arg vehicle) -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)"/>
+
+    <param name="robot_description" command="$(find xacro)/xacro $(arg model) enable_mavlink_interface:=$(arg enable_mavlink_interface)" />
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model"
+        args="-z 7.5 -x 50 -urdf -model robot -param robot_description" respawn="false" output="screen" />
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher"  name="robot_state_publisher">
+     <param name="publish_frequency" type="double" value="30.0" />
+   </node>
     <!-- MAVROS -->
     <include file="$(find mavros)/launch/px4.launch">
         <!-- GCS link is provided by SITL -->
@@ -59,8 +66,4 @@
         <arg name="respawn_mavros" value="$(arg respawn_mavros)"/>
     </include>
 
-    <!-- Leaflet -->
-    <include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch">
-        <arg name="port" value="9090"/>
-    </include>
 </launch>

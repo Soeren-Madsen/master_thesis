@@ -1,0 +1,298 @@
+<?xml version="1.0"?>
+
+<robot name="convecdro" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Included Properties -->
+  <xacro:include filename="/home/soren/master_thesis/src/asv_wave_sim/asv_wave_sim_gazebo/models/convecdro/convecdro_property.xacro" />
+
+  <!-- Included Mcros -->
+  <xacro:include filename="/home/soren/master_thesis/src/asv_wave_sim/asv_wave_sim_gazebo/models/convecdro/convecdro_macro.xacro" />
+
+<xacro:arg name='mavlink_addr' default='INADDR_ANY' />
+<xacro:arg name='mavlink_udp_port' default='14560' />
+<xacro:arg name='mavlink_tcp_port' default='4560' />
+<xacro:arg name='serial_enabled' default='false' />
+<xacro:arg name='serial_device' default='/dev/ttyACM0' />
+<xacro:arg name='baudrate' default='921600' />
+<xacro:arg name='qgc_addr' default='INADDR_ANY' />
+<xacro:arg name='qgc_udp_port' default='14550' />
+<xacro:arg name='sdk_addr' default='INADDR_ANY' />
+<xacro:arg name='sdk_udp_port' default='14540' />
+<xacro:arg name='hil_mode' default='0' />
+<xacro:arg name='hil_state_level' default='0' />
+<xacro:arg name='vehicle_is_tailsitter' default='0' />
+<xacro:arg name='send_vision_estimation' default='1' />
+<xacro:arg name='send_odometry' default='0' />
+<xacro:arg name='enable_lockstep' default='0' />
+<xacro:arg name='use_tcp' default='1' />
+
+
+ <!-- Instantiate gps plugin. -->
+  <!--xacro:gps_plugin_macro
+    namespace="${namespace}"
+    gps_noise="true"
+    >
+  </xacro:gps_plugin_macro-->
+
+
+  <!-- Instantiate magnetometer plugin. -->
+  <xacro:magnetometer_plugin_macro
+    namespace="${namespace}"
+    pub_rate="20"
+    noise_density="0.0004"
+    random_walk="0.0000064"
+    bias_correlation_time="600"
+    mag_topic="/mag"
+    >
+  </xacro:magnetometer_plugin_macro>
+
+  <!-- Instantiate barometer plugin. -->
+  <xacro:barometer_plugin_macro
+    namespace="${namespace}"
+    pub_rate="10"
+    baro_topic="/baro"
+    >
+  </xacro:barometer_plugin_macro>
+
+<xacro:imu_plugin_macro
+    namespace="${namespace}"
+    imu_suffix=""
+    parent_link="base_link"
+    imu_topic="/imu"
+    mass_imu_sensor="0.015"
+    gyroscope_noise_density="0.0003394"
+    gyroscopoe_random_walk="0.000038785"
+    gyroscope_bias_correlation_time="1000.0"
+    gyroscope_turn_on_bias_sigma="0.0087"
+    accelerometer_noise_density="0.004"
+    accelerometer_random_walk="0.006"
+    accelerometer_bias_correlation_time="300.0"
+    accelerometer_turn_on_bias_sigma="0.1960"
+  >
+    <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+    <origin xyz="0 0 0" rpy="0 0 0" />
+  </xacro:imu_plugin_macro>
+
+  <!-- Instantiate mavlink telemetry interface. -->
+  <xacro:mavlink_interface_macro
+    namespace="${namespace}"
+    imu_sub_topic="/imu"
+    gps_sub_topic="/gps"
+    mag_sub_topic="/mag"
+    baro_sub_topic="/baro"
+    mavlink_addr="INADDR_ANY"
+    mavlink_udp_port="14560"
+    mavlink_tcp_port ="4560"
+    serial_enabled ="false"
+    serial_device = "/dev/ttyACM0"
+    baudrate = "921600"
+    qgc_addr = "INADDR_ANY"
+    qgc_udp_port ="14550"
+    sdk_addr="INADDR_ANY"
+    sdk_udp_port="14540"
+    hil_mode="0"
+    hil_state_level="0"
+    vehicle_is_tailsitter="0"
+    send_vision_estimation="1"
+    send_odometry="0"
+    enable_lockstep="0"
+    use_tcp="1"
+    >
+  </xacro:mavlink_interface_macro>
+
+
+
+  <!-- Instantiate multirotor_base_macro once -->
+  <xacro:multirotor_base_macro
+    robot_namespace="${namespace}"
+    mass="${chassis_mass}"
+    body_width="${chassis_width}"
+    body_height="${chassis_height}"
+    mesh_file="${chassis_mesh_file}"
+    mesh_scale="${chassis_mesh_scale}"
+    color="${color}"
+    >
+    <xacro:insert_block name="chassis_inertia" />
+  </xacro:multirotor_base_macro>
+
+  <!-- Instantiate hood macro once -->
+  <xacro:convecdro_hood_macro
+    robot_namespace="${namespace}"
+    parent="base_link"
+    mass="${hood_mass}"
+    body_width="${hood_width}"
+    body_height="${hood_height}"
+    mesh_file="${hood_mesh_file}"
+    mesh_scale="${hood_mesh_scale}"
+    >
+    <origin xyz="${hood_x} ${hood_y} ${hood_offset}" rpy="0 0 0" />
+    <xacro:insert_block name="hood_inertia" />
+  </xacro:convecdro_hood_macro>
+
+  <!-- Instantiate left leg -->
+  <xacro:convecdro_leg_macro
+    robot_namespace="${namespace}"
+    leg="left"
+    parent="base_link"
+    mass="${leg_mass}"
+    body_width="${leg_width}"
+    body_length="${leg_length}"
+    body_height="${leg_height}"
+    mesh_file="${leg_left_mesh_file}"
+    mesh_scale="${leg_mesh_scale}"
+    >
+    <origin xyz="${leg_offset_x} ${leg_offset_y} ${leg_offset_z}" rpy="0 0 0" />
+    <xacro:insert_block name="leg_inertia" />
+  </xacro:convecdro_leg_macro>
+
+  <!-- Instantiate right leg -->
+  <xacro:convecdro_leg_macro
+    robot_namespace="${namespace}"
+    leg="right"
+    parent="base_link"
+    mass="${leg_mass}"
+    body_width="${leg_width}"
+    body_length="${leg_length}"
+    body_height="${leg_height}"
+    mesh_file="${leg_right_mesh_file}"
+    mesh_scale="${leg_mesh_scale}"
+    >
+    <origin xyz="${leg_offset_x} -${leg_offset_y} ${leg_offset_z}" rpy="0 0 0" />
+    <xacro:insert_block name="leg_inertia" />
+  </xacro:convecdro_leg_macro>
+
+  <!-- Rotor 0 (CW) -->
+  <xacro:vertical_rotor
+    robot_namespace="${namespace}"
+    suffix="rotor_0"
+    direction="cw"
+    motor_constant="${motor_constant}"
+    moment_constant="${moment_constant}"
+    parent="base_link"
+    rotor_mass="${rotor_mass}"
+    radius_rotor="${radius_rotor}"
+    time_constant_up="${time_constant_up}"
+    time_constant_down="${time_constant_down}"
+    max_rot_velocity="${max_rot_velocity}"
+    motor_number="0"
+    rotor_drag_coefficient="${rotor_drag_coefficient}"
+    rolling_moment_coefficient="${rolling_moment_coefficient}"
+    mesh="prop"
+    mesh_scale="${mesh_scale_prop}"
+    color="Blue">
+    <origin xyz="${rotor0_x} ${rotor0_y} ${rotor_offset_top}" rpy="0 0 0" />
+    <xacro:insert_block name="rotor_inertia" />
+  </xacro:vertical_rotor>
+
+  <!-- Rotor 1 (CCW) -->
+  <xacro:vertical_rotor
+    robot_namespace="${namespace}"
+    suffix="rotor_1"
+    direction="ccw"
+    motor_constant="${motor_constant}"
+    moment_constant="${moment_constant}"
+    parent="base_link"
+    rotor_mass="${rotor_mass}"
+    radius_rotor="${radius_rotor}"
+    time_constant_up="${time_constant_up}"
+    time_constant_down="${time_constant_down}"
+    max_rot_velocity="${max_rot_velocity}"
+    motor_number="1"
+    rotor_drag_coefficient="${rotor_drag_coefficient}"
+    rolling_moment_coefficient="${rolling_moment_coefficient}"
+    mesh="prop"
+    mesh_scale="${mesh_scale_prop}"
+    color="DarkGrey">
+    <origin xyz="${rotor1_x} ${rotor1_y} ${rotor_offset_top}" rpy="0 0 0" />
+    <xacro:insert_block name="rotor_inertia" />
+  </xacro:vertical_rotor>
+
+  <!-- Rotor 2 (CW) -->
+  <xacro:vertical_rotor robot_namespace="${namespace}"
+    suffix="rotor_2"
+    direction="cw"
+    motor_constant="${motor_constant}"
+    moment_constant="${moment_constant}"
+    parent="base_link"
+    rotor_mass="${rotor_mass}"
+    radius_rotor="${radius_rotor}"
+    time_constant_up="${time_constant_up}"
+    time_constant_down="${time_constant_down}"
+    max_rot_velocity="${max_rot_velocity}"
+    motor_number="2"
+    rotor_drag_coefficient="${rotor_drag_coefficient}"
+    rolling_moment_coefficient="${rolling_moment_coefficient}"
+    mesh="prop"
+    mesh_scale="${mesh_scale_prop}"
+    color="Blue">
+    <origin xyz="${rotor2_x} ${rotor2_y} ${rotor_offset_top}" rpy="0 0 0" />
+    <xacro:insert_block name="rotor_inertia" />
+  </xacro:vertical_rotor>
+
+  <!-- Rotor 3 (CCW) -->
+  <xacro:vertical_rotor robot_namespace="${namespace}"
+    suffix="rotor_3"
+    direction="ccw"
+    motor_constant="${motor_constant}"
+    moment_constant="${moment_constant}"
+    parent="base_link"
+    rotor_mass="${rotor_mass}"
+    radius_rotor="${radius_rotor}"
+    time_constant_up="${time_constant_up}"
+    time_constant_down="${time_constant_down}"
+    max_rot_velocity="${max_rot_velocity}"
+    motor_number="3"
+    rotor_drag_coefficient="${rotor_drag_coefficient}"
+    rolling_moment_coefficient="${rolling_moment_coefficient}"
+    mesh="prop"
+    mesh_scale="${mesh_scale_prop}"
+    color="DarkGrey">
+    <origin xyz="${rotor3_x} ${rotor3_y} ${rotor_offset_top}" rpy="0 0 0" />
+    <xacro:insert_block name="rotor_inertia" />
+  </xacro:vertical_rotor>
+
+  <!-- Rotor 4 (CCW) -->
+  <xacro:vertical_rotor robot_namespace="${namespace}"
+    suffix="rotor_4"
+    direction="ccw"
+    motor_constant="${motor_constant}"
+    moment_constant="${moment_constant}"
+    parent="base_link"
+    rotor_mass="${rotor_mass}"
+    radius_rotor="${radius_rotor}"
+    time_constant_up="${time_constant_up}"
+    time_constant_down="${time_constant_down}"
+    max_rot_velocity="${max_rot_velocity}"
+    motor_number="4"
+    rotor_drag_coefficient="${rotor_drag_coefficient}"
+    rolling_moment_coefficient="${rolling_moment_coefficient}"
+    mesh="prop"
+    mesh_scale="${mesh_scale_prop}"
+    color="DarkGrey">
+    <origin xyz="${rotor4_x} ${rotor4_y} ${rotor_offset_top}" rpy="0 0 0" />
+    <xacro:insert_block name="rotor_inertia" />
+  </xacro:vertical_rotor>
+
+  <!-- Rotor 5 (CW) -->
+  <xacro:vertical_rotor robot_namespace="${namespace}"
+    suffix="rotor_5"
+    direction="cw"
+    motor_constant="${motor_constant}"
+    moment_constant="${moment_constant}"
+    parent="base_link"
+    rotor_mass="${rotor_mass}"
+    radius_rotor="${radius_rotor}"
+    time_constant_up="${time_constant_up}"
+    time_constant_down="${time_constant_down}"
+    max_rot_velocity="${max_rot_velocity}"
+    motor_number="5"
+    rotor_drag_coefficient="${rotor_drag_coefficient}"
+    rolling_moment_coefficient="${rolling_moment_coefficient}"
+    mesh="prop"
+    mesh_scale="${mesh_scale_prop}"
+    color="Blue">
+    <origin xyz="${rotor5_x} ${rotor5_y} ${rotor_offset_top}" rpy="0 0 0" />
+    <xacro:insert_block name="rotor_inertia" />
+  </xacro:vertical_rotor>
+
+</robot>

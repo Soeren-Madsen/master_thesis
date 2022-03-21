@@ -1,0 +1,12 @@
+#!/bin/sh
+#
+# @name Typhoon H480 SITL
+#
+# @type Hexarotor x
+#
+
+#sh /etc/init.d/rc.mc_defaults
+. ${R}etc/init.d/rc.mc_defaults
+
+set MAV_TYPE 13
+set MIXER hexa_x
