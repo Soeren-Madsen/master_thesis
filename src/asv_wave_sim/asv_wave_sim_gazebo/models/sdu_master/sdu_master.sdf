@@ -82,7 +82,7 @@
     </joint>
 
     <!-- Landing gear -->
-    <link name='aed_box'>
+    <link name='servo_holder'>
       <pose> 0 0 0 0 0 0 </pose>
       <inertial>
         <mass>0.1</mass>
@@ -92,8 +92,8 @@
           <izz>0.002805359</izz> <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
         </inertia>
       </inertial>
-      <collision name='aed_box_collision'>
-        <pose> 0 0 0 1.57 0 0</pose>
+      <collision name='servo_holder_collision'>
+        <pose> 0 0 0.02 1.57 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.1 0.1 0.1</scale>
@@ -101,7 +101,7 @@
           </mesh>
         </geometry>
       </collision>  
-      <visual name='aed_box_visual'>
+      <visual name='servo_holder_visual'>
         <pose> 0 0 0.02 1.57 0 0</pose>
         <geometry>
           <mesh>
@@ -111,24 +111,60 @@
         </geometry>
       </visual>
     </link>
-    <joint name='aed_box_joint' type='revolute'>
-      <child>aed_box</child>
+    <joint name='servo_holder_joint' type='fixed'>
+      <child>servo_holder</child>
       <parent>base_link</parent>
-      <axis>
+    </joint>
+
+<!-- Landing gear -->
+    <link name='upper_leg1'>
+      <pose> 0 0 0 0 0 0 </pose>
+      <inertial>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.0000001</ixx> <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+          <iyy>0.0000001</iyy> <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+          <izz>0.0000001</izz> <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+        </inertia>
+      </inertial>
+      <!--collision name='upper_leg1_collision'>
+        <pose> 0 -0.1 -0.1 1.57 0.785 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.01 0.01 0.01</scale>
+            <uri>model://sdu_master/meshes/leg_top.dae</uri>
+          </mesh>
+        </geometry>
+      </collision-->  
+      <visual name='upper_leg1_visual'>
+        <pose> 0 -0.2 -0.1 1.57 0.785 1.57</pose>
+        <geometry>
+          <mesh>
+            <scale>0.1 0.1 0.1</scale>
+            <uri>model://sdu_master/meshes/leg_top.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+
+  <joint name='upper_leg1_joint' type='fixed'>
+      <child>upper_leg1</child>
+      <parent>servo_holder</parent>
+	<pose> 0 -0.09 0 0 0 0</pose>
+    </joint>
+    <!--joint name='upper_leg1_joint' type='revolute'>
+      <child>upper_leg1</child>
+      <parent>servo_holder</parent>
+	<pose> 0 -0.09 0 0 0 0</pose>
+	<axis>
         <xyz>1 0 0</xyz>
-        <limit>
-          <lower>0</lower>
-          <upper>0</upper>
-          <effort>0</effort>
-          <velocity>0</velocity>
-        </limit>
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
-      </axis>
-    </joint>
+        </axis>
+    </joint-->
       
     <!-- Rotor 0 (CW) -->
     <link name='rotor_0'>
