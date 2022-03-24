@@ -1,0 +1,420 @@
+<?xml version="1.0"?>
+<!--
+  Copyright 2015 Fadri Furrer, ASL, ETH Zurich, Switzerland
+  Copyright 2015 Michael Burri, ASL, ETH Zurich, Switzerland
+  Copyright 2015 Mina Kamel, ASL, ETH Zurich, Switzerland
+  Copyright 2015 Janosch Nikolic, ASL, ETH Zurich, Switzerland
+  Copyright 2015 Markus Achtelik, ASL, ETH Zurich, Switzerland
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- Macro to add logging to a bag file. -->
+  <!-- Main multirotor link -->
+  <xacro:macro name="multirotor_base_macro"
+    params="robot_namespace mass body_width body_height mesh_file mesh_scale color *inertia">
+    <link name="base_link"></link>
+
+    <joint name="base_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <parent link="base_link" />
+      <child link="base_link_inertia" />
+    </joint>
+
+    <link name="base_link_inertia">
+      <inertial>
+        <mass value="${mass}" />  <!-- [kg] -->
+        <origin xyz="0 0 0" />
+        <xacro:insert_block name="inertia" />
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 -0.1" rpy="0 0 0.5233333" />
+        <geometry>
+          <mesh filename="/home/soren/master_thesis/src/asv_wave_sim/asv_wave_sim_gazebo/models/convecdro/meshes/${mesh_file}"
+            scale="${mesh_scale}" />
+        </geometry>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${body_width} ${body_width} ${body_height}" /> <!-- [m] [m] [m] -->
+        </geometry>
+      </collision>
+    </link>
+
+    <!-- attach multirotor_base_plugin to the base_link -->
+    <gazebo>
+      <plugin filename="libgazebo_multirotor_base_plugin.so" name="rosbag">
+        <robotNamespace>${robot_namespace}</robotNamespace>
+        <linkName>base_link</linkName>
+        <rotorVelocitySlowdownSim>${rotor_velocity_slowdown_sim}</rotorVelocitySlowdownSim>
+      </plugin>
+    </gazebo>
+
+    <gazebo>
+      <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+        <robotNamespace>${robot_namespace}</robotNamespace>
+      </plugin>
+    </gazebo>
+
+    <gazebo reference="base_link">
+      <material>Gazebo/${color}</material>
+      <collision name='base_link_inertia_collision'>
+        <surface>
+          <contact>
+            <ode>
+              <min_depth>0.001</min_depth>
+              <max_vel>0.0</max_vel>
+            </ode>
+          </contact>
+          <friction>
+            <ode/>
+          </friction>
+        </surface>
+      </collision>
+   </gazebo>
+  </xacro:macro>
+
+  <!-- ConVecDro hood macro -->
+  <xacro:macro name="convecdro_hood_macro"
+    params="robot_namespace parent mass body_width body_height mesh_file mesh_scale *origin *inertia">
+
+    <joint name="convecdro_hood_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent}" />
+      <child link="convecdro_hood_link" />
+    </joint>
+
+    <link name="convecdro_hood_link">
+      <inertial>
+        <mass value="${mass}" />  <!-- [kg] -->
+        <origin xyz="0 0 0" />
+        <xacro:insert_block name="inertia" />
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="/home/soren/master_thesis/src/asv_wave_sim/asv_wave_sim_gazebo/models/convecdro/meshes/${mesh_file}"
+            scale="${mesh_scale}" />
+        </geometry>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${body_width} ${body_width} ${body_height}" /> <!-- [m] [m] [m] -->
+        </geometry>
+      </collision>
+    </link>
+  </xacro:macro>
+
+  <!-- ConVecDro leg macro -->
+  <xacro:macro name="convecdro_leg_macro"
+    params="robot_namespace leg parent mass body_width body_length body_height mesh_file mesh_scale *origin *inertia">
+
+    <joint name="convecdro_leg_${leg}_joint" type="continuous">
+      <xacro:insert_block name="origin" />
+      <axis xyz="1 0 0" />
+      <parent link="${parent}" />
+      <child link="convecdro_leg_${leg}_link" />
+      <limit effort="1000.0" lower="-0.48" upper="0.48" velocity="2.5" />
+      <dynamics damping="0.0" friction="0.0" />
+    </joint>
+
+    <link name="convecdro_leg_${leg}_link">
+      <inertial>
+        <mass value="${mass}" />  <!-- [kg] -->
+        <origin xyz="0 0 0" />
+        <xacro:insert_block name="inertia" />
+      </inertial>
+
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${body_width} ${body_length} ${body_height}" /> <!-- [m] [m] [m] -->
+        </geometry>
+      </visual>
+
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="${body_width} ${body_length} ${body_height}" /> <!-- [m] [m] [m] -->
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>0.01</mu>
+              <mu2>0.01</mu2>
+            </ode>
+          </friction>
+        </surface>
+      </collision>
+    </link>
+
+    <transmission name="trans_convecdro_leg_${leg}">
+      <type>transmission_interface/SimpleTransmission</type>
+      <joint name="convecdro_leg_${leg}_joint">
+          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      </joint>
+      <actuator name="convecdro_leg_${leg}">
+          <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+          <mechanicalReduction>1</mechanicalReduction>
+      </actuator>
+    </transmission>
+  </xacro:macro>
+
+  <!-- Rotor joint and link -->
+  <xacro:macro name="vertical_rotor"
+    params="robot_namespace suffix direction motor_constant moment_constant parent rotor_mass radius_rotor time_constant_up time_constant_down max_rot_velocity motor_number rotor_drag_coefficient rolling_moment_coefficient color mesh mesh_scale *origin *inertia">
+    <joint name="rotor_${motor_number}_joint" type="continuous">
+      <xacro:insert_block name="origin" />
+      <axis xyz="0 0 1" />
+      <parent link="${parent}" />
+      <child link="rotor_${motor_number}" />
+
+    </joint>
+
+    <link name="rotor_${motor_number}">
+      <inertial>
+        <mass value="${rotor_mass}" /> <!-- [kg] -->
+        <xacro:insert_block name="inertia" />
+      </inertial>
+      <visual>
+        <geometry>
+          <!-- <cylinder length="0.005" radius="${radius_rotor}"/> --> <!-- [m] -->
+          <!-- <mesh filename="package://rotors_description/meshes/propeller_${direction}.dae" -->
+          <mesh filename="/home/soren/master_thesis/src/asv_wave_sim/asv_wave_sim_gazebo/models/convecdro/meshes/${mesh}_${direction}.dae"
+            scale="${mesh_scale}" />
+          <!-- <box size="${2*radius_rotor} 0.01 0.005"/> -->
+        </geometry>
+      </visual>
+      <collision>
+        <geometry>
+          <cylinder length="0.005" radius="${radius_rotor}" /> <!-- [m] -->
+        </geometry>
+      </collision>
+    </link>
+    <gazebo>
+      <plugin name="motor_model_${suffix}" filename="libgazebo_motor_model.so">
+        <robotNamespace>${robot_namespace}</robotNamespace>
+        <jointName>rotor_${motor_number}_joint</jointName>
+        <linkName>rotor_${motor_number}</linkName>
+        <turningDirection>${direction}</turningDirection>
+        <timeConstantUp>${time_constant_up}</timeConstantUp>
+        <timeConstantDown>${time_constant_down}</timeConstantDown>
+        <maxRotVelocity>${max_rot_velocity}</maxRotVelocity>
+        <motorConstant>${motor_constant}</motorConstant>
+        <momentConstant>${moment_constant}</momentConstant>
+        <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
+        <motorNumber>${motor_number}</motorNumber>
+        <rotorDragCoefficient>${rotor_drag_coefficient}</rotorDragCoefficient>
+        <rollingMomentCoefficient>${rolling_moment_coefficient}</rollingMomentCoefficient>
+        <motorSpeedPubTopic>/motor_speed/${motor_number}</motorSpeedPubTopic>
+        <rotorVelocitySlowdownSim>${rotor_velocity_slowdown_sim}</rotorVelocitySlowdownSim>
+      </plugin>
+    </gazebo>
+    <gazebo reference="rotor_${motor_number}">
+      <material>Gazebo/${color}</material>
+    </gazebo>
+  </xacro:macro>
+
+  <xacro:macro name="box_inertial" params="x y z mass *origin">
+    <inertial>
+      <mass value="${mass}" />
+      <xacro:insert_block name="origin" />
+      <inertia ixx="${0.0833333 * mass * (y*y + z*z)}" ixy="0.0" ixz="0.0"
+        iyy="${0.0833333 * mass * (x*x + z*z)}" iyz="0.0"
+        izz="${0.0833333 * mass * (x*x + y*y)}" />
+    </inertial>
+  </xacro:macro>
+
+<!-- Macro to add the controller interface. -->
+  <xacro:macro name="controller_plugin_macro" params="namespace imu_sub_topic">
+    <gazebo>
+      <plugin name="controller_interface" filename="libgazebo_controller_interface.so">
+        <robotNamespace>${namespace}</robotNamespace>
+        <commandAttitudeThrustSubTopic>/command/attitude</commandAttitudeThrustSubTopic>
+        <commandRateThrustSubTopic>/command/rate</commandRateThrustSubTopic>
+        <commandMotorSpeedSubTopic>/command/motor_speed</commandMotorSpeedSubTopic>
+        <imuSubTopic>/${imu_sub_topic}</imuSubTopic>
+        <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- Macro to add the gps_plugin. -->
+  <xacro:macro name="gps_plugin_macro" params="namespace gps_noise">
+    <gazebo>
+      <plugin name="gps_plugin" filename="libgazebo_gps_plugin.so">
+        <robotNamespace>${namespace}</robotNamespace>
+        <gpsNoise>${gps_noise}</gpsNoise>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- Macro to add the magnetometer_plugin. -->
+  <xacro:macro name="magnetometer_plugin_macro" params="namespace pub_rate noise_density random_walk bias_correlation_time mag_topic">
+    <gazebo>
+      <plugin name="magnetometer_plugin" filename="libgazebo_magnetometer_plugin.so">
+        <robotNamespace>${namespace}</robotNamespace>
+        <pubRate>${pub_rate}</pubRate>
+        <noiseDensity>${noise_density}</noiseDensity>
+        <randomWalk>${random_walk}</randomWalk>
+        <biasCorrelationTime>${bias_correlation_time}</biasCorrelationTime>
+        <magTopic>${mag_topic}</magTopic>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- Macro to add the barometer_plugin. -->
+  <xacro:macro name="barometer_plugin_macro" params="namespace pub_rate baro_topic">
+    <gazebo>
+      <plugin name="barometer_plugin" filename="libgazebo_barometer_plugin.so">
+        <robotNamespace>${namespace}</robotNamespace>
+        <pubRate>${pub_rate}</pubRate>
+        <baroTopic>${baro_topic}</baroTopic>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+
+
+<xacro:macro name="mavlink_interface_macro" params="namespace imu_sub_topic gps_sub_topic mag_sub_topic baro_sub_topic mavlink_addr mavlink_udp_port mavlink_tcp_port serial_enabled serial_device baudrate qgc_addr qgc_udp_port sdk_addr sdk_udp_port hil_mode hil_state_level vehicle_is_tailsitter send_vision_estimation send_odometry enable_lockstep use_tcp">
+    <gazebo>
+      <plugin name="mavlink_interface" filename="libgazebo_mavlink_interface.so">
+        <robotNamespace>${namespace}</robotNamespace>
+        <imuSubTopic>${imu_sub_topic}</imuSubTopic>
+        <gpsSubTopic>${gps_sub_topic}</gpsSubTopic>
+        <magSubTopic>${mag_sub_topic}</magSubTopic>
+        <baroSubTopic>${baro_sub_topic}</baroSubTopic>
+        <mavlink_addr>$(arg mavlink_addr)</mavlink_addr>
+        <mavlink_udp_port>$(arg mavlink_udp_port)</mavlink_udp_port>
+        <mavlink_tcp_port>$(arg mavlink_tcp_port)</mavlink_tcp_port>
+        <serialEnabled>$(arg serial_enabled)</serialEnabled>
+        <serialDevice>$(arg serial_device)</serialDevice>
+        <baudRate>$(arg baudrate)</baudRate>
+        <qgc_addr>$(arg qgc_addr)</qgc_addr>
+        <qgc_udp_port>$(arg qgc_udp_port)</qgc_udp_port>
+        <sdk_addr>$(arg sdk_addr)</sdk_addr>
+        <sdk_udp_port>$(arg sdk_udp_port)</sdk_udp_port>
+        <hil_mode>$(arg hil_mode)</hil_mode>
+        <hil_state_level>$(arg hil_state_level)</hil_state_level>
+        <vehicle_is_tailsitter>$(arg vehicle_is_tailsitter)</vehicle_is_tailsitter>
+        <send_vision_estimation>$(arg send_vision_estimation)</send_vision_estimation>
+        <send_odometry>$(arg send_odometry)</send_odometry>
+        <enable_lockstep>$(arg enable_lockstep)</enable_lockstep>
+        <use_tcp>$(arg use_tcp)</use_tcp>
+        <motorSpeedCommandPubTopic>/gazebo/command/motor_speed</motorSpeedCommandPubTopic>
+        <control_channels>
+          <channel name="rotor0">
+            <input_index>0</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>1000</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>100</zero_position_armed>
+            <joint_control_type>velocity</joint_control_type>
+          </channel>
+          <channel name="rotor1">
+            <input_index>1</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>1000</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>100</zero_position_armed>
+            <joint_control_type>velocity</joint_control_type>
+          </channel>
+          <channel name="rotor2">
+            <input_index>2</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>1000</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>100</zero_position_armed>
+            <joint_control_type>velocity</joint_control_type>
+          </channel>
+          <channel name="rotor3">
+            <input_index>3</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>1000</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>100</zero_position_armed>
+            <joint_control_type>velocity</joint_control_type>
+          </channel>
+          <channel name="rotor4">
+            <input_index>4</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>1000</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>100</zero_position_armed>
+            <joint_control_type>velocity</joint_control_type>
+          </channel>
+          <channel name="rotor5">
+            <input_index>5</input_index>
+            <input_offset>0</input_offset>
+            <input_scaling>1000</input_scaling>
+            <zero_position_disarmed>0</zero_position_disarmed>
+            <zero_position_armed>100</zero_position_armed>
+            <joint_control_type>velocity</joint_control_type>
+          </channel>
+        </control_channels>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+<xacro:macro name="imu_plugin_macro"
+    params="namespace imu_suffix parent_link imu_topic
+      mass_imu_sensor gyroscope_noise_density gyroscopoe_random_walk
+      gyroscope_bias_correlation_time gyroscope_turn_on_bias_sigma
+      accelerometer_noise_density accelerometer_random_walk
+      accelerometer_bias_correlation_time accelerometer_turn_on_bias_sigma
+      *inertia *origin">
+    <!-- IMU link -->
+    <link name="${namespace}/imu${imu_suffix}_link">
+      <inertial>
+        <xacro:insert_block name="inertia" />
+        <mass value="${mass_imu_sensor}" />  <!-- [kg] -->
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </inertial>
+    </link>
+    <!-- IMU joint -->
+    <joint name="${namespace}/imu${imu_suffix}_joint" type="revolute">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent_link}" />
+      <child link="${namespace}/imu${imu_suffix}_link" />
+      <limit upper="0" lower="0" effort="0" velocity="0" />
+    </joint>
+    <gazebo>
+      <plugin filename="libgazebo_imu_plugin.so" name="rotors_gazebo_imu${imu_suffix}_plugin">
+      <!-- A good description of the IMU parameters can be found in the kalibr documentation:
+           https://github.com/ethz-asl/kalibr/wiki/IMU-Noise-Model-and-Intrinsics -->
+        <robotNamespace>${namespace}</robotNamespace> <!-- (string, required): ros namespace in which the messages are published -->
+        <linkName>${namespace}/imu${imu_suffix}_link</linkName> <!-- (string, required): name of the body which holds the IMU sensor -->
+        <imuTopic>${imu_topic}</imuTopic> <!-- (string): name of the sensor output topic and prefix of service names (defaults to imu) -->
+        <gyroscopeNoiseDensity>${gyroscope_noise_density}</gyroscopeNoiseDensity> <!-- Gyroscope noise density (two-sided spectrum) [rad/s/sqrt(Hz)] -->
+        <gyroscopeRandomWalk>${gyroscopoe_random_walk}</gyroscopeRandomWalk> <!-- Gyroscope bias random walk [rad/s/s/sqrt(Hz)] -->
+        <gyroscopeBiasCorrelationTime>${gyroscope_bias_correlation_time}</gyroscopeBiasCorrelationTime> <!-- Gyroscope bias correlation time constant [s] -->
+        <gyroscopeTurnOnBiasSigma>${gyroscope_turn_on_bias_sigma}</gyroscopeTurnOnBiasSigma> <!-- Gyroscope turn on bias standard deviation [rad/s] -->
+        <accelerometerNoiseDensity>${accelerometer_noise_density}</accelerometerNoiseDensity> <!-- Accelerometer noise density (two-sided spectrum) [m/s^2/sqrt(Hz)] -->
+        <accelerometerRandomWalk>${accelerometer_random_walk}</accelerometerRandomWalk> <!-- Accelerometer bias random walk. [m/s^2/s/sqrt(Hz)] -->
+        <accelerometerBiasCorrelationTime>${accelerometer_bias_correlation_time}</accelerometerBiasCorrelationTime> <!-- Accelerometer bias correlation time constant [s] -->
+        <accelerometerTurnOnBiasSigma>${accelerometer_turn_on_bias_sigma}</accelerometerTurnOnBiasSigma> <!-- Accelerometer turn on bias standard deviation [m/s^2] -->
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+      
+
+
+</robot>

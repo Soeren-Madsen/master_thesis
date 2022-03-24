@@ -1,26 +1,26 @@
 <?xml version='1.0'?>
 <sdf version='1.6'>
-  <model name='sdu_aed'>
-    <!-- SDU Drone body -->
+  <model name='convecdro'>
+    <!-- ConVecDro body -->
     <link name='base_link'>
       <pose>0 0 0 0 -0 0</pose>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
         <mass>1.5</mass>
         <inertia>
-          <ixx>0.0762625</ixx>
+          <ixx>0.057625</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.0762625</iyy>
+          <iyy>0.057625</iyy>
           <iyz>0</iyz>
-          <izz>0.1369</izz>
+          <izz>0.112225</izz>
         </inertia>
       </inertial>
       <collision name='base_link_inertia_collision'>
         <pose>0 0 0 0 -0 0</pose>
         <geometry>
           <box>
-            <size>0.74 0.74 0.25</size>
+            <size>1 1 0.11</size>
           </box>
         </geometry>
         <surface>
@@ -36,13 +36,19 @@
         </surface>
       </collision>
       <visual name='base_link_inertia_visual'>
-        <pose>0 0 0.125 0 0 0</pose>
+        <pose>0 0 -0.1 0 0 0.5233333</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://sdu_description/meshes/sdu_drone.dae</uri>
+            <uri>model://convecdro/meshes/chassis.stl</uri>
           </mesh>
         </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
       </visual>
       <gravity>1</gravity>
       <velocity_decay/>
@@ -81,94 +87,202 @@
       </axis>
     </joint>
 
-    <!-- Landing gear -->
-    <link name='servo_holder'>
-      <pose> 0 0 0 0 0 0 </pose>
+
+    <!-- ConVecDro hood -->
+    <link name='hood_link'>
+      <pose>0 0 0.034 0 0 0</pose>
       <inertial>
-        <mass>0.1</mass>
+        <pose>0 0 0 0 0 0</pose>
+        <mass>0.015</mass>
         <inertia>
-          <ixx>0.003643274</ixx> <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
-          <iyy>0.004857971</iyy> <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
-          <izz>0.002805359</izz> <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+          <ixx>1e-05</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-05</iyy>
+          <iyz>0</iyz>
+          <izz>1e-05</izz>
         </inertia>
       </inertial>
-      <collision name='servo_holder_collision'>
-        <pose> 0 0 0.02 1.57 0 0</pose>
+      <visual name="hood_link_visual">
         <geometry>
           <mesh>
-            <scale>0.1 0.1 0.1</scale>
-            <uri>model://sdu_master/meshes/servo_holder_correct.dae</uri>
-          </mesh>
-        </geometry>
-      </collision>  
-      <visual name='servo_holder_visual'>
-        <pose> 0 0 0.02 1.57 0 0</pose>
-        <geometry>
-          <mesh>
-            <scale>0.1 0.1 0.1</scale>
-            <uri>model://sdu_master/meshes/servo_holder_correct.dae</uri>
+             <scale>1.1 1.1 1.1</scale>
+             <uri>model://convecdro/meshes/hood.dae</uri>
           </mesh>
         </geometry>
       </visual>
     </link>
-    <joint name='servo_holder_joint' type='fixed'>
-      <child>servo_holder</child>
+    <joint name='hood_joint' type='fixed'>
+      <child>hood_link</child>
       <parent>base_link</parent>
+      <pose>0 0 0 0 0 0</pose>
     </joint>
 
-<!-- Landing gear -->
-    <link name='upper_leg1'>
-      <pose> 0 0 0 0 0 0 </pose>
+    <!-- ConVecDro landing gear -->
+    <link name="left_leg">
+      <pose>0 0 -0.1 0 0 0</pose>
       <inertial>
+        <pose>0 -0.235 -0.235 0 0 0</pose>
         <mass>0.1</mass>
         <inertia>
-          <ixx>0.0000001</ixx> <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
-          <iyy>0.0000001</iyy> <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
-          <izz>0.0000001</izz> <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+          <ixx>0.002104166667</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.002104166667</iyy>
+          <iyz>0</iyz>
+          <izz>0.00004166666667</izz>
         </inertia>
       </inertial>
-      <!--collision name='upper_leg1_collision'>
-        <pose> 0 -0.1 -0.1 1.57 0.785 0</pose>
+      <collision name='collision'>
+        <pose>0 -0.235 -0.235 0 1.56893 0</pose>
+        <geometry>
+          <box>
+            <size>0.05 0.05 0.5</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+            </ode>
+          </friction>
+          <contact>
+            <ode>
+              <kp>1e+8</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0.001</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='base_link_left_leg'>
+        <pose>0 -0.02 0.08 0 0 0</pose>
         <geometry>
           <mesh>
-            <scale>0.01 0.01 0.01</scale>
-            <uri>model://sdu_master/meshes/leg_top.dae</uri>
+            <scale>0.0015 0.0015 0.0015</scale>
+            <uri>model://convecdro/meshes/leg2_remeshed_v3.stl</uri>
           </mesh>
         </geometry>
-      </collision-->  
-      <visual name='upper_leg1_visual'>
-        <pose> 0 -0.2 -0.1 1.57 0.785 1.57</pose>
-        <geometry>
-          <mesh>
-            <scale>0.1 0.1 0.1</scale>
-            <uri>model://sdu_master/meshes/leg_top.dae</uri>
-          </mesh>
-        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
       </visual>
     </link>
-
-  <joint name='upper_leg1_joint' type='fixed'>
-      <child>upper_leg1</child>
-      <parent>servo_holder</parent>
-	<pose> 0 -0.09 0 0 0 0</pose>
-    </joint>
-    <!--joint name='upper_leg1_joint' type='revolute'>
-      <child>upper_leg1</child>
-      <parent>servo_holder</parent>
-	<pose> 0 -0.09 0 0 0 0</pose>
-	<axis>
-        <xyz>1 0 0</xyz>
+    <joint name='left_leg_joint' type='fixed'>
+      <child>left_leg</child>
+      <parent>base_link</parent>
+      <pose>0 -0.1 -0.01 0 0 0</pose>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>1</upper>
+          <effort>100</effort>
+          <velocity>-1</velocity>
+          <stiffness>100000000</stiffness>
+          <dissipation>1</dissipation>
+        </limit>
         <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
+          <damping>0.1</damping>
         </dynamics>
         <use_parent_model_frame>1</use_parent_model_frame>
-        </axis>
-    </joint-->
-      
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+
+    <link name="right_leg">
+      <pose>0 0 -0.1 0 0 0</pose>
+      <inertial>
+        <pose>0 0.235 -0.235 0 0 0</pose>
+        <mass>0.1</mass>
+        <inertia>
+          <ixx>0.002104166667</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>0.002104166667</iyy>
+          <iyz>0</iyz>
+          <izz>0.00004166666667</izz>
+        </inertia>
+      </inertial>
+      <collision name='collision'>
+        <pose>0 0.235 -0.235 0 1.56893 0</pose>
+        <geometry>
+          <box>
+            <size>0.05 0.05 0.5</size>
+          </box>
+        </geometry>
+        <surface>
+          <friction>
+            <ode>
+              <mu>1</mu>
+              <mu2>1</mu2>
+            </ode>
+          </friction>
+          <contact>
+            <ode>
+              <kp>1e+8</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0.001</min_depth>
+            </ode>
+          </contact>
+        </surface>
+      </collision>
+      <visual name='base_link_right_leg'>
+        <pose>0 0.02 0.08 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.0015 0.0015 0.0015</scale>
+            <uri>model://convecdro/meshes/leg1_remeshed_v3.stl</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <name>Gazebo/DarkGrey</name>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+          </script>
+        </material>
+      </visual>
+    </link>
+    <joint name='right_leg_joint' type='fixed'>
+      <child>right_leg</child>
+      <parent>base_link</parent>
+      <pose>0 0.1 -0.01 0 0 0</pose>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>1</upper>
+          <effort>100</effort>
+          <velocity>-1</velocity>
+          <stiffness>100000000</stiffness>
+          <dissipation>1</dissipation>
+        </limit>
+        <dynamics>
+          <damping>0.1</damping>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+      <physics>
+        <ode>
+          <implicit_spring_damper>1</implicit_spring_damper>
+        </ode>
+      </physics>
+    </joint>
+
+
     <!-- Rotor 0 (CW) -->
     <link name='rotor_0'>
-      <pose>0.0 -0.37 0.170 0 -0 0</pose>
+      <pose>0.0 -0.440000 0.023 0 -0 0</pose>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
         <mass>0.005</mass>
@@ -203,7 +317,7 @@
         <geometry>
           <mesh>
             <scale>1.5 1.5 1.5</scale>
-            <uri>model://sdu_description/meshes/prop_cw.dae</uri>
+            <uri>model://convecdro/meshes/prop_cw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -235,7 +349,7 @@
 
     <!-- Rotor 1 (CCW) -->
     <link name='rotor_1'>
-      <pose>0 0.37 0.170 0 -0 0</pose>
+      <pose>0 0.440000 0.023 0 -0 0</pose>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
         <mass>0.005</mass>
@@ -270,7 +384,7 @@
         <geometry>
           <mesh>
             <scale>1.5 1.5 1.5</scale>
-            <uri>model://sdu_description/meshes/prop_ccw.dae</uri>
+            <uri>model://convecdro/meshes/prop_cww.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -302,7 +416,7 @@
 
     <!-- Rotor 2 (CW) -->
     <link name='rotor_2'>
-      <pose>0.320429 0.185000 0.170 0 -0 0</pose>
+      <pose>0.381051 0.220000 0.023 0 -0 0</pose>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
         <mass>0.005</mass>
@@ -337,7 +451,7 @@
         <geometry>
           <mesh>
             <scale>1.5 1.5 1.5</scale>
-            <uri>model://sdu_description/meshes/prop_cw.dae</uri>
+            <uri>model://convecdro/meshes/prop_cw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -369,7 +483,7 @@
 
     <!-- Rotor 3 (CW) -->
     <link name='rotor_3'>
-      <pose>-0.320429 -0.185000 0.170 0 -0 0</pose>
+      <pose>-0.381051 -0.220000 0.023 0 -0 0</pose>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
         <mass>0.005</mass>
@@ -404,7 +518,7 @@
         <geometry>
           <mesh>
             <scale>1.5 1.5 1.5</scale>
-            <uri>model://sdu_description/meshes/prop_ccw.dae</uri>
+            <uri>model://convecdro/meshes/prop_cw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -437,7 +551,7 @@
 
     <!-- Rotor 4 (CW) -->
     <link name='rotor_4'>
-      <pose>0.320429 -0.185000 0.170 0 -0 0</pose>
+      <pose>0.381051 -0.220000 0.023 0 -0 0</pose>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
         <mass>0.005</mass>
@@ -472,7 +586,7 @@
         <geometry>
           <mesh>
             <scale>1.5 1.5 1.5</scale>
-            <uri>model://sdu_description/meshes/prop_ccw.dae</uri>
+            <uri>model://convecdro/meshes/prop_cw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -504,7 +618,7 @@
 
     <!-- Rotor 5 (CCW) -->
     <link name='rotor_5'>
-      <pose>-0.320429 0.185000 0.170 0 -0 0</pose>
+      <pose>-0.381051 0.220000 0.023 0 -0 0</pose>
       <inertial>
         <pose>0 0 0 0 -0 0</pose>
         <mass>0.005</mass>
@@ -539,7 +653,7 @@
         <geometry>
           <mesh>
             <scale>1.5 1.5 1.5</scale>
-            <uri>model://sdu_description/meshes/prop_cw.dae</uri>
+            <uri>model://convecdro/meshes/prop_cw.dae</uri>
           </mesh>
         </geometry>
         <material>
@@ -744,13 +858,6 @@
       <pubRate>10</pubRate>
       <baroTopic>/baro</baroTopic>
     </plugin>
-
-    <plugin name='parachute_plugin' filename='libgazebo_parachute_plugin.so'>
-      <robotNamespace/>
-      <commandSubTopic>/gazebo/command/motor_speed</commandSubTopic>
-      <motorNumber>6</motorNumber>
-    </plugin>
-
     <plugin name='mavlink_interface' filename='libgazebo_mavlink_interface.so'>
       <robotNamespace></robotNamespace>
       <imuSubTopic>/imu</imuSubTopic>
@@ -854,11 +961,5 @@
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
 
-    <!--include>      
-      <pose>0 0 0 0 0 0</pose>
-      <uri>model://landing_gear/landing_gear.urdf</uri>
-      <name>landing_gear0</name>
-    </include-->
-
-  </model>
+</model>
 </sdf>

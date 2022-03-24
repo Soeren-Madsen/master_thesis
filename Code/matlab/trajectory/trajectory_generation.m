@@ -22,7 +22,7 @@ zd_dot_hat = zd_dot(t0,freq, A) + zd_dot(t0,freq2, A2) + zd_dot(t0,freq3, A3);
 zrmax_ddot = 5;
 zrmax_dot = 2;
 za = z_t0 - zd_hat;
-za_dot = z_dot_t0 - (zd_dot(t0,freq, A) + zd_dot(t0,freq2, A2) + zd_dot(t0,freq3, A3));
+za_dot = z_dot_t0 - (zd_dot_hat);
 za_tau = 1;
 syms tau;
 
@@ -35,7 +35,7 @@ za_ddot_plot = 0;
 za_dot_plot = 0;
 za_plot = 0;
 t_plot = t;
-while t < 12
+while t < 7.01
     zd_d_tau = zd_dot(tau,freq,A) + zd_dot(tau,freq2,A2) + zd_dot(tau,freq3,A3);
     zd_d_t = zd_dot(t,freq,A) + zd_dot(t,freq2,A2) + zd_dot(t,freq3,A3);
     
@@ -64,7 +64,7 @@ while t < 12
     za=za + za_dot*dt+1/2*za_ddot*dt^2;
     
     zd_vec = [zd_vec, zd_t];
-    zr = za-zd_t;
+    zr = za+zd_t
     z_ref = [z_ref, za+zd_t];
     za_ddot_plot = [za_ddot_plot, za_ddot];
     za_dot_plot = [za_dot_plot, za_dot];
@@ -75,9 +75,9 @@ end
 %plot(za_ddot_plot)
 %figure(2)
 %plot(za_dot_plot)
-figure(3)
-%plot(za_plot)
 %figure(3)
+%plot(za_plot)
+figure(3)
 hold on;
 plot(t_plot, zd_vec);
 plot(t_plot, z_ref);

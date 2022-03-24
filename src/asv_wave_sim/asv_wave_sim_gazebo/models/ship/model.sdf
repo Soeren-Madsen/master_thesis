@@ -54,14 +54,6 @@
           <iyz>0.0</iyz>
           <izz>193333</izz>
         </inertia>
-        <!--inertia>
-          <ixx>33333</ixx>
-          <ixy>0.0</ixy>
-          <ixz>0.0</ixz>
-          <iyy>173333</iyy>
-          <iyz>0.0</iyz>
-          <izz>193333</izz>
-        </inertia-->
       </inertial>
     </link>
 
@@ -86,7 +78,7 @@
                <iyy>0.0001</iyy>
                <iyz>0</iyz>
                <izz>0.0001</izz>
-               <!-- low intertia necessary to avoid not disturb the drone -->
+               <!-- low intertia necessary to avoid not disturb the ship -->
             </inertia>
           </inertial>
 
@@ -113,6 +105,42 @@
           <pose>0 0 0 0 0 0</pose>
           <parent>base_link</parent>
           <child>imu_link</child>
+        </joint>
+
+
+<link name="world_link">
+          <pose>0 0 0 0 0 0</pose>
+          <collision name="collision">
+            <pose>0 0 0 0 0 0</pose>
+            <geometry>
+              <box>
+                <size>0.01 0.01 0.01</size>
+              </box>
+            </geometry>
+          </collision>
+          <inertial>
+            <mass>0.006</mass>
+            <inertia>
+               <ixx>0.0001</ixx>
+               <ixy>0</ixy>
+               <ixz>0</ixz>
+               <iyy>0.0001</iyy>
+               <iyz>0</iyz>
+               <izz>0.0001</izz>
+               <!-- low intertia necessary to avoid not disturb the ship -->
+            </inertia>
+          </inertial>
+</link>
+
+
+
+<!--Can make the ship only move along Z axis-->
+<joint name="world_joint" type="prismatic">
+            <child>base_link</child>
+            <parent>world</parent>
+            <axis>
+                <xyz>0 0 1</xyz>
+            </axis>
         </joint>
 
 
