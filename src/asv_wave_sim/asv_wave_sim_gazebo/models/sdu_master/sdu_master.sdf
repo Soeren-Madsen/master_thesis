@@ -720,6 +720,9 @@
             <gpsZNoiseDensity>0.0004</gpsZNoiseDensity>
             <gpsVXYNoiseDensity>0.2</gpsVXYNoiseDensity>
             <gpsVZNoiseDensity>0.4</gpsVZNoiseDensity>
+	    <referenceLatitude>47.3972419</referenceLatitude>
+    	    <referenceLongitude>8.5455939</referenceLongitude>
+    	    <referenceAltitude>535.844915703</referenceAltitude>
           </plugin>
         </sensor>
       </link>

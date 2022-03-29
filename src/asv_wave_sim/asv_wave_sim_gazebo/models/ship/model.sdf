@@ -145,7 +145,8 @@
 
 
 <!-- GPS link -->
-    <plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
+    <!-- STANDARD GPS -->
+    <!--plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
     <alwayson>true</alwayson>
     <updaterate>1.0</updaterate>
     <bodyname>base_link</bodyname>
@@ -155,6 +156,21 @@
     <gaussiannoise>0.1 0.1 0.1</gaussiannoise>
     <velocitydrift>0 0 0</velocitydrift>
     <velocitygaussiannoise>0.1 0.1 0.1</velocitygaussiannoise>
+    <referenceLatitude>47.3977419</referenceLatitude>
+    <referenceLongitude>8.5455939</referenceLongitude>
+    <referenceAltitude>535.844915703</referenceAltitude>
+</plugin-->
+
+<plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
+    <alwayson>true</alwayson>
+    <updaterate>50.0</updaterate>
+    <bodyname>base_link</bodyname>
+    <topicname>/ship_gps</topicname>
+    <velocitytopicname>/ship_velocity</velocitytopicname>
+    <drift>0 0 0</drift>
+    <gaussiannoise>0.01 0.01 0.01</gaussiannoise>
+    <velocitydrift>0 0 0</velocitydrift>
+    <velocitygaussiannoise>0.01 0.01 0.01</velocitygaussiannoise>
     <referenceLatitude>47.3977419</referenceLatitude>
     <referenceLongitude>8.5455939</referenceLongitude>
     <referenceAltitude>535.844915703</referenceAltitude>
