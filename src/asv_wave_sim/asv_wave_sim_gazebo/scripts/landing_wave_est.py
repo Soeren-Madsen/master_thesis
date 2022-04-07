@@ -165,35 +165,35 @@ class Drone():
         return targetPosition
 
     def follow_ship(self):
-        targetPosition = PositionTarget()
-        targetPosition.coordinate_frame = 1
-        #targetPosition = PoseStamped()
-        targetPosition.type_mask = 4088 #Ignore everything but PX, PY, PZ, #VZ #4056
-        #targetPosition.type_mask = 984 #Ignore everything but PX, PY, PZ, VZ and Yaw
+        #targetPosition = PositionTarget()
+        #targetPosition.coordinate_frame = 1
+        targetPosition = PoseStamped()
+        #targetPosition.type_mask = 4088 #Ignore everything but PX, PY, PZ, #VZ #4056
         self.kf.update_control_sig(self.current_imu.linear_acceleration.z-9.8)
-        #targetPosition.pose.position.x = -50.
-        #targetPosition.pose.position.y = 0.
+        targetPosition.pose.position.x = -50.
+        targetPosition.pose.position.y = 0.
 
-        targetPosition.position.x = -50
-        targetPosition.position.y = 0
+        #targetPosition.position.x = -50
+        #targetPosition.position.y = 0
         dist =  self.current_position_geo.altitude - self.targetGPS.altitude
         print("Distance to ship: ", dist)
         #print("Altitude of drone: ", self.current_position.pose.position.z)
         x = self.kf.update_predict(dist, self.current_position.pose.position.z)
         
-        #targetPosition.pose.position.z = x[2] + self.altitude
-        targetPosition.position.z = x[2] + self.altitude
+        targetPosition.pose.position.z = x[2] + self.altitude
+        #targetPosition.position.z = x[2] + self.altitude
 
         st, self.z = signal.lfilter(self.b, 1, [x[3]], zi=self.z)
-        self.f_v.write(','.join ([str(self.current_position.pose.position.z), str(self.targetGPS.altitude - self.home_alt + 5.35), str(st), '\n']))
-        self.f_v.write(',')
+        self.f_v.write(','.join([str(self.current_position.pose.position.z), str(self.targetGPS.altitude - self.home_alt + 5.35), str(dist), '\n']))
+        #self.f_v.write(',')
 
-        targetPosition.velocity.z = x[3]
+        #targetPosition.velocity.z = x[3]
+        #targetPosition.velocity.z = st[0]
 
         # targetVelocity = TwistStamped()
         # targetVelocity.twist.linear.z = x[3]
         self.f_x.write(','.join([str(x[0]), str(x[1]), str(x[2]), str(x[3]), '\n']))
-        self.f_x.write(',')
+        #self.f_x.write(',')
 
         return targetPosition#, targetVelocity
         
@@ -217,8 +217,9 @@ class Drone():
                 #print("target_pos: ", target_pos.pose.position.z)
                 #print("target_vel: ", target_vel)            
                 #self.target_vel_pub.publish(target_vel)
+                self.target_pos_pub.publish(target_pos)
 
-                self.target_pos_pub2.publish(target_pos)
+                #self.target_pos_pub2.publish(target_pos)
                 
             else:
                 target_pos = self.set_target()
