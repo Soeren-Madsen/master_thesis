@@ -13,6 +13,7 @@ from mavros_msgs.srv import CommandBool, SetMode, CommandTOL
 from math import sqrt
 from sensor_msgs.msg import NavSatFix, Imu, Image
 from kalman_ship import Kalman_est
+from pose_est_board_3d import Aruco_pose
 from scipy import signal
 from cv_bridge import CvBridge, CvBridgeError
 
@@ -45,6 +46,8 @@ class Drone():
         self.kf.init_guess(self.altitude)
         self.landing_allowed = False
         self.image_ac = False
+
+        self.aru = Aruco_pose()
 
         #Lowpass filter:
         self.b = signal.firwin(25, 0.02)
@@ -190,9 +193,12 @@ class Drone():
         targetPosition.position.x = -50
         targetPosition.position.y = 0
         dist =  self.current_position_geo.altitude - self.targetGPS.altitude
+        dist_aruco = self.aru.calc_euler(self.cv_image) #Calculate distance to ship based on aruco markers
         print("Distance to ship: ", dist)
+        print("Distance to ship aruco: ", dist_aruco[0])
+        print("Dist dif: ", dist_aruco - dist)
         #print("Altitude of drone: ", self.current_position.pose.position.z)
-        x = self.kf.update_predict(dist, self.current_position.pose.position.z)
+        x = self.kf.update_predict(dist_aruco[0], self.current_position.pose.position.z)
         
         #targetPosition.pose.position.z = x[2] + self.altitude
         targetPosition.position.z = x[2] + self.altitude
@@ -208,10 +214,6 @@ class Drone():
         # targetVelocity.twist.linear.z = x[3]
         self.f_x.write(','.join([str(x[0]), str(x[1]), str(x[2]), str(x[3]), '\n']))
         #self.f_x.write(',')
-
-        if not self.image_ac:
-            self.image_ac = True
-            cv2.imwrite("test.jpg", self.cv_image)
 
         
 
