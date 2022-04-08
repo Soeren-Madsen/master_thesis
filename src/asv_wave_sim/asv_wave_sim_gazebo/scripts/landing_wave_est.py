@@ -2,6 +2,8 @@
 
 import rospy
 import mavros
+import cv2
+import numpy as np
 from utm import utmconv
 from std_msgs.msg import Header
 from geometry_msgs.msg import PoseStamped, TwistStamped, Twist
@@ -9,9 +11,10 @@ from geographic_msgs.msg import GeoPoseStamped
 from mavros_msgs.msg import State, PositionTarget
 from mavros_msgs.srv import CommandBool, SetMode, CommandTOL
 from math import sqrt
-from sensor_msgs.msg import NavSatFix, Imu
+from sensor_msgs.msg import NavSatFix, Imu, Image
 from kalman_ship import Kalman_est
 from scipy import signal
+from cv_bridge import CvBridge, CvBridgeError
 
 
 '''
@@ -41,8 +44,8 @@ class Drone():
         self.kf = Kalman_est()
         self.kf.init_guess(self.altitude)
         self.landing_allowed = False
+        self.image_ac = False
 
-        #Lowpass filter
         #Lowpass filter:
         self.b = signal.firwin(25, 0.02)
         self.z = signal.lfilter_zi(self.b, 1)*0 #0 er start værdi for filteret
@@ -60,12 +63,15 @@ class Drone():
         self.land_client = rospy.ServiceProxy("/mavros/cmd/land", CommandTOL)
         self.takeoff_client = rospy.ServiceProxy("/mavros/cmd/takeoff", CommandTOL)
 
+        self.bridge = CvBridge()
+
         ## Subscribers:
         self.state_sub = rospy.Subscriber('/mavros/state', State, self.state_cb)
         self.pos_sub = rospy.Subscriber("/mavros/global_position/raw/fix", NavSatFix, self.gps_pos_cb)
         self.pos_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.position_cb)
         self.target_pos_sub = rospy.Subscriber("/fix", NavSatFix, self.target_cb)
         self.imu_sub = rospy.Subscriber('/mavros/imu/data', Imu, self.imu_cb)
+        self.img_sub = rospy.Subscriber("/camera/color/image_raw", Image, self.image_cb)
 
         ## Publishers:
         self.target_pos_pub = rospy.Publisher("/mavros/setpoint_position/local", PoseStamped, queue_size=1)
@@ -96,6 +102,14 @@ class Drone():
 
     def imu_cb(self, data):
         self.current_imu = data
+
+    def image_cb(self, img_msg):
+        # log some info about the image topic
+        
+
+        # Try to convert the ROS Image message to a CV2 Image
+        self.cv_image = im = np.frombuffer(img_msg.data, dtype=np.uint8).reshape(img_msg.height, img_msg.width, -1)
+        # Show the converted image
 
     def setup(self):
         print("Waiting for FCU connection...")
@@ -165,35 +179,41 @@ class Drone():
         return targetPosition
 
     def follow_ship(self):
-        #targetPosition = PositionTarget()
-        #targetPosition.coordinate_frame = 1
-        targetPosition = PoseStamped()
-        #targetPosition.type_mask = 4088 #Ignore everything but PX, PY, PZ, #VZ #4056
+        targetPosition = PositionTarget()
+        targetPosition.coordinate_frame = 1
+        #targetPosition = PoseStamped()
+        targetPosition.type_mask = 4088 #Ignore everything but PX, PY, PZ, #VZ #4056
         self.kf.update_control_sig(self.current_imu.linear_acceleration.z-9.8)
-        targetPosition.pose.position.x = -50.
-        targetPosition.pose.position.y = 0.
+        #targetPosition.pose.position.x = -50.
+        #targetPosition.pose.position.y = 0.
 
-        #targetPosition.position.x = -50
-        #targetPosition.position.y = 0
+        targetPosition.position.x = -50
+        targetPosition.position.y = 0
         dist =  self.current_position_geo.altitude - self.targetGPS.altitude
         print("Distance to ship: ", dist)
         #print("Altitude of drone: ", self.current_position.pose.position.z)
         x = self.kf.update_predict(dist, self.current_position.pose.position.z)
         
-        targetPosition.pose.position.z = x[2] + self.altitude
-        #targetPosition.position.z = x[2] + self.altitude
+        #targetPosition.pose.position.z = x[2] + self.altitude
+        targetPosition.position.z = x[2] + self.altitude
 
         st, self.z = signal.lfilter(self.b, 1, [x[3]], zi=self.z)
         self.f_v.write(','.join([str(self.current_position.pose.position.z), str(self.targetGPS.altitude - self.home_alt + 5.35), str(dist), '\n']))
         #self.f_v.write(',')
 
-        #targetPosition.velocity.z = x[3]
-        #targetPosition.velocity.z = st[0]
+        #targetPosition.velocity.z = x[3] #No low pass filter
+        targetPosition.velocity.z = st[0] #With low pass filter
 
         # targetVelocity = TwistStamped()
         # targetVelocity.twist.linear.z = x[3]
         self.f_x.write(','.join([str(x[0]), str(x[1]), str(x[2]), str(x[3]), '\n']))
         #self.f_x.write(',')
+
+        if not self.image_ac:
+            self.image_ac = True
+            cv2.imwrite("test.jpg", self.cv_image)
+
+        
 
         return targetPosition#, targetVelocity
         
@@ -217,9 +237,9 @@ class Drone():
                 #print("target_pos: ", target_pos.pose.position.z)
                 #print("target_vel: ", target_vel)            
                 #self.target_vel_pub.publish(target_vel)
-                self.target_pos_pub.publish(target_pos)
+                #self.target_pos_pub.publish(target_pos)
 
-                #self.target_pos_pub2.publish(target_pos)
+                self.target_pos_pub2.publish(target_pos)
                 
             else:
                 target_pos = self.set_target()

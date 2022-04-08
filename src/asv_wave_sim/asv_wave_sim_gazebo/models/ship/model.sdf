@@ -2,7 +2,7 @@
 <sdf version='1.6'>
 
   <model name='ship'>
-    <pose>0 0 0 0 0 0</pose>
+    <pose>2 0 0 0 0 0</pose>
     <static>false</static>
 
     <plugin name="hydrodynamics" filename="libHydrodynamicsPlugin.so">
@@ -25,16 +25,16 @@
 
     <link name="base_link">
       <visual name="base_visual">
-	<pose>0 0 0 1.6707 0 0</pose>
+	<pose>0 0 1 -1.57079632679 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://ship/meshes/new_ship.dae</uri>
+            <uri>model://ship/meshes/ship_aruco.dae</uri>
 	    <scale>5 5 5</scale>
           </mesh>
         </geometry>
       </visual>
       <collision name="base_collision">
-	<pose>0 0 1 0 0 0</pose>
+	<pose>0 0 0 0 0 0</pose>
         <geometry>
           <box>
             <size>10 4 2</size>

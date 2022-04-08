@@ -82,15 +82,15 @@
     </joint>
 
     <!-- Landing gear -->
-    <link name='servo_holder'>
+    <!--link name='servo_holder'>
       <pose> 0 0 0 0 0 0 </pose>
       <inertial>
         <mass>0.1</mass>
         <inertia>
-          <ixx>0.003643274</ixx> <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
-          <iyy>0.004857971</iyy> <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
-          <izz>0.002805359</izz> <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
-        </inertia>
+          <ixx>0.003643274</ixx--> <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+          <!--iyy>0.004857971</iyy--> <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+          <!--izz>0.002805359</izz--> <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+        <!--/inertia>
       </inertial>
       <collision name='servo_holder_collision'>
         <pose> 0 0 0.02 1.57 0 0</pose>
@@ -114,19 +114,19 @@
     <joint name='servo_holder_joint' type='fixed'>
       <child>servo_holder</child>
       <parent>base_link</parent>
-    </joint>
+    </joint-->
 
 <!-- Landing gear -->
-    <link name='upper_leg1'>
+    <!--link name='upper_leg1'>
       <pose> 0 0 0 0 0 0 </pose>
       <inertial>
         <mass>0.1</mass>
         <inertia>
-          <ixx>0.0000001</ixx> <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
-          <iyy>0.0000001</iyy> <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
-          <izz>0.0000001</izz> <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
-        </inertia>
-      </inertial>
+          <ixx>0.0000001</ixx--> <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+          <!--iyy>0.0000001</iyy--> <!-- for a box: iyy = 0.083 * mass * (x*x + z*z) -->
+          <!--izz>0.0000001</izz--> <!-- for a box: izz = 0.083 * mass * (x*x + y*y) -->
+        <!--/inertia>
+      </inertial-->
       <!--collision name='upper_leg1_collision'>
         <pose> 0 -0.1 -0.1 1.57 0.785 0</pose>
         <geometry>
@@ -136,7 +136,7 @@
           </mesh>
         </geometry>
       </collision-->  
-      <visual name='upper_leg1_visual'>
+      <!--visual name='upper_leg1_visual'>
         <pose> 0 -0.2 -0.1 1.57 0.785 1.57</pose>
         <geometry>
           <mesh>
@@ -151,7 +151,7 @@
       <child>upper_leg1</child>
       <parent>servo_holder</parent>
 	<pose> 0 -0.09 0 0 0 0</pose>
-    </joint>
+    </joint-->
     <!--joint name='upper_leg1_joint' type='revolute'>
       <child>upper_leg1</child>
       <parent>servo_holder</parent>
@@ -856,6 +856,86 @@
       <accelerometerBiasCorrelationTime>300.0</accelerometerBiasCorrelationTime>
       <accelerometerTurnOnBiasSigma>0.196</accelerometerTurnOnBiasSigma>
     </plugin>
+
+
+<!-- Depth Camera sensor -->
+    <link name='sensor_link'>
+      <pose>0.0 0.0 -0.08 0 0 0</pose>
+      <inertial>
+        <mass>0.095</mass>
+        <inertia>
+          <ixx>4.15e-6</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>2.407e-6</iyy>
+          <iyz>0</iyz>
+          <izz>2.407e-6</izz>
+        </inertia>
+      </inertial>
+      <visual name='visual'>
+        <geometry>
+          <cylinder>
+            <length>0.026</length>
+            <radius>0.061</radius>
+          </cylinder>
+        </geometry>
+      </visual>
+      <sensor name="depth_camera" type="depth">
+        <update_rate>30</update_rate>
+        <pose>0.0 0.0 0.0 0 1.57 0</pose>
+        <camera>
+          <horizontal_fov>1.22173</horizontal_fov>
+          <image>
+            <format>R8G8B8</format>
+            <width>320</width>
+            <height>240</height>
+          </image>
+          <clip>
+            <near>0.1</near>
+            <far>20</far>
+          </clip>
+        </camera>
+        <plugin filename="libgazebo_ros_openni_kinect.so" name="camera_controller">
+          <cameraName>camera</cameraName>
+          <alwaysOn>true</alwaysOn>
+          <updateRate>30</updateRate>
+          <pointCloudCutoff>0.25</pointCloudCutoff>
+          <pointCloudCutoffMax>9</pointCloudCutoffMax>
+          <imageTopicName>color/image_raw</imageTopicName>
+          <cameraInfoTopicName>color/camera_info</cameraInfoTopicName>
+          <depthImageTopicName>depth/image_rect_raw</depthImageTopicName>
+          <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
+          <pointCloudTopicName>depth/color/points</pointCloudTopicName>
+          <frameName>camera_link</frameName>
+          <distortion_k1>0.0</distortion_k1>
+          <distortion_k2>0.0</distortion_k2>
+          <distortion_k3>0.0</distortion_k3>
+          <distortion_t1>0.0</distortion_t1>
+          <distortion_t2>0.0</distortion_t2>
+        </plugin>
+      </sensor>
+      <self_collide>0</self_collide>
+      <kinematic>0</kinematic>
+    </link>
+
+<joint name='sensor_joint' type='revolute'>
+      <child>sensor_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+          <effort>0</effort>
+          <velocity>0</velocity>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
 
     <!--include>      
       <pose>0 0 0 0 0 0</pose>
