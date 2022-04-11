@@ -13,8 +13,8 @@ import time
 class Aruco_pose():
     def __init__(self):
         # Side length of the ArUco marker in meters 
-        aruco_marker_side_length =0.17 #0.092 #0.17 in gazebo
-        aruco_marker_space = 0.04 #0.014 #0.04 in gazebo
+        aruco_marker_side_length =0.097 #0.092 #0.17 in gazebo
+        aruco_marker_space = 0.025 #0.014 #0.04 in gazebo
 
         # Calibration parameters yaml file
         camera_calibration_parameters_filename = 'calibration_chessboard.yaml' #SKAL OPDATERES TIL GAZEBO!!!!!!!!!!!!!!!!!
@@ -44,6 +44,8 @@ class Aruco_pose():
 
         self.rvecs = None
         self.tvecs = None    
+
+        self.transform_translation_z = 10
 
 
 
@@ -84,12 +86,14 @@ class Aruco_pose():
 
             if success > 0:
                 frame = cv2.aruco.drawAxis(frame, self.mtx, self.dst, rvecs, tvecs, 0.05)
+            else:
+                print("No Aruco markers found!")
             for i, marker_id in enumerate(marker_ids):
         
                 # Store the translation (i.e. position) information
                 transform_translation_x = tvecs[0]
                 transform_translation_y = tvecs[1]
-                transform_translation_z = tvecs[2] + 0.7 #The 0.7 is the difference of true measurement and aruco placement on the ship in gazebo
+                self.transform_translation_z = tvecs[2] + 0.1 #The 0.7 is the difference of true measurement and aruco placement on the ship in gazebo
         
                 # Store the rotation information
                 rotation_matrix = np.eye(4)
@@ -128,7 +132,7 @@ class Aruco_pose():
                     print("Something went wrong with Rodrigues")
 
         #cv2.imshow('frame',frame)
-        return transform_translation_z
+        return self.transform_translation_z #Using last value if no aruco marker is detected
 
  
 def main():

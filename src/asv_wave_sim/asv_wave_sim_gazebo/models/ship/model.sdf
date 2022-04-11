@@ -28,7 +28,7 @@
 	<pose>0 0 1 -1.57079632679 0 0</pose>
         <geometry>
           <mesh>
-            <uri>model://ship/meshes/ship_aruco.dae</uri>
+            <uri>model://ship/meshes/aruco_ship_small.dae</uri>
 	    <scale>5 5 5</scale>
           </mesh>
         </geometry>

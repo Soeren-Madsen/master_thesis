@@ -4,6 +4,7 @@ import rospy
 import mavros
 import cv2
 import numpy as np
+import time
 from utm import utmconv
 from std_msgs.msg import Header
 from geometry_msgs.msg import PoseStamped, TwistStamped, Twist
@@ -20,8 +21,11 @@ from cv_bridge import CvBridge, CvBridgeError
 
 '''
 Denne siger hvordan PositionTarget skal sættes http://docs.ros.org/en/api/mavros_msgs/html/msg/PositionTarget.html 
-NÆSTE GANG tjek hvor meget lavpas filteret forsinker min kontroller, noget i vejen med log. Den skal nok også tunes.
-Virker nogenlunde med velocity controller og position, ikke den store forskel på om man bruger 1 eller 2. 
+NÆSTE GANG: 
+- Find ud af hvad jeg gør hvis jeg ikke kan finde en aruco marker.
+- Få fremskaffet en bedre ground truth for at kunne lave test. Evt ent direkte model data frem. Lige nu bliver dist beregnet ud fra GPS kun, i sammenligning
+og gør så de bruger samme koord sys, så man ikke skal trække random værdi fra.
+- Lav samme log test som tidligere med den nye, for at se hvor godt den følger.
 '''
 
 class Drone():
@@ -39,13 +43,17 @@ class Drone():
         self.receivedPosition = False
         #self.home_position = NavSatFix()
         #self.current_position = NavSatFix()
-        self.altitude = 5.
+        self.altitude = 4.
         self.uc = utmconv()
         self.setup_topics()
         self.kf = Kalman_est()
         self.kf.init_guess(self.altitude)
         self.landing_allowed = False
         self.image_ac = False
+        self.allow_landing = False
+        self.counter = 0
+        self.max_alt_ship = 0
+        self.landing_speed = 1.5
 
         self.aru = Aruco_pose()
 
@@ -111,7 +119,7 @@ class Drone():
         
 
         # Try to convert the ROS Image message to a CV2 Image
-        self.cv_image = im = np.frombuffer(img_msg.data, dtype=np.uint8).reshape(img_msg.height, img_msg.width, -1)
+        self.cv_image = np.frombuffer(img_msg.data, dtype=np.uint8).reshape(img_msg.height, img_msg.width, -1)
         # Show the converted image
 
     def setup(self):
@@ -182,6 +190,8 @@ class Drone():
         return targetPosition
 
     def follow_ship(self):
+
+        start = time.time()
         targetPosition = PositionTarget()
         targetPosition.coordinate_frame = 1
         #targetPosition = PoseStamped()
@@ -192,11 +202,11 @@ class Drone():
 
         targetPosition.position.x = -50
         targetPosition.position.y = 0
-        dist =  self.current_position_geo.altitude - self.targetGPS.altitude
+        dist =  self.current_position_geo.altitude - self.targetGPS.altitude-0.5
         dist_aruco = self.aru.calc_euler(self.cv_image) #Calculate distance to ship based on aruco markers
-        print("Distance to ship: ", dist)
+        #print("Distance to ship: ", dist)
         print("Distance to ship aruco: ", dist_aruco[0])
-        print("Dist dif: ", dist_aruco - dist)
+        #print("Dist dif: ", dist_aruco[0] - dist)
         #print("Altitude of drone: ", self.current_position.pose.position.z)
         x = self.kf.update_predict(dist_aruco[0], self.current_position.pose.position.z)
         
@@ -204,15 +214,39 @@ class Drone():
         targetPosition.position.z = x[2] + self.altitude
 
         st, self.z = signal.lfilter(self.b, 1, [x[3]], zi=self.z)
-        self.f_v.write(','.join([str(self.current_position.pose.position.z), str(self.targetGPS.altitude - self.home_alt + 5.35), str(dist), '\n']))
+        self.f_v.write(','.join([str(self.current_position.pose.position.z), str(self.targetGPS.altitude - self.home_alt + 5.35), str(dist_aruco[0]), str(dist), str(x[1]), '\n']))
         #self.f_v.write(',')
 
         #targetPosition.velocity.z = x[3] #No low pass filter
         targetPosition.velocity.z = st[0] #With low pass filter
 
-        # targetVelocity = TwistStamped()
-        # targetVelocity.twist.linear.z = x[3]
         self.f_x.write(','.join([str(x[0]), str(x[1]), str(x[2]), str(x[3]), '\n']))
+
+        ship_alt = self.targetGPS.altitude - self.home_alt + 5.35
+        if dist_aruco < self.altitude + 0.2:
+            self.counter = self.counter + 1
+            if ship_alt<self.max_alt_ship:
+                self.max_alt_ship = ship_alt
+        print("ship min alt: ", self.max_alt_ship)
+        print("ship alt: ", ship_alt)
+        
+        
+        if self.counter > 200 and ship_alt < 0.9*self.max_alt_ship:
+            self.allow_landing = True
+            
+
+        if self.allow_landing:
+            self.altitude = self.altitude - self.landing_speed/self.hz
+            print("Landing")
+            
+
+        end = time.time()
+        #print("Time taken: ", end-start)
+        self.rate.sleep()
+        
+        #if not self.image_ac and dist_aruco < 5.1:
+        #    cv2.imwrite('test.jpg', self.cv_image)
+        #    image_ac = True
         #self.f_x.write(',')
 
         

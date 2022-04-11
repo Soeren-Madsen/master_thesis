@@ -1,10 +1,10 @@
 [ 36%] Built target Hydrodynamics
-[ 51%] Built target WaveMsgPublisher
-[ 54%] Built target TestRunner
-[ 60%] Built target HydrodynamicsMsgPublisher
-[ 66%] Built target WaveMsgSubscriber
-[ 72%] Built target WavefieldVisualPlugin
+[ 42%] Built target HydrodynamicsMsgPublisher
+[ 48%] Built target WaveMsgPublisher
+[ 54%] Built target WavefieldModelPlugin
+[ 60%] Built target HydrodynamicsMsgSubscriber
+[ 72%] Built target TestRunner
 [ 78%] Built target HydrodynamicsPlugin
-[ 84%] Built target WavefieldModelPlugin
-[ 90%] Built target HydrodynamicsMsgSubscriber
+[ 84%] Built target WavefieldVisualPlugin
+[ 90%] Built target WaveMsgSubscriber
 [100%] Built target GzTestRunner
