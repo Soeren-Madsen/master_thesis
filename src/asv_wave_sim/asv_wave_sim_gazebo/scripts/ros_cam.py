@@ -27,24 +27,22 @@ class CameraPublisher(object):
         cap = cv2.VideoCapture(-1)
 
 
-        while True:
             # Capture frame-by-frame
             # This method returns True/False as well as the video frame.
-            ret, frame = cap.read()
+        ret, frame = cap.read()
+            # Print debugging information to the terminal
+            #rospy.loginfo('publishing video frame')
 
-            if ret == True:
-                # Print debugging information to the terminal
-                #rospy.loginfo('publishing video frame')
+            # converts an OpenCV image to a ROS image message
+            #img_msg = br.cv2_to_imgmsg(frame, encoding='rgb8')
 
-                # converts an OpenCV image to a ROS image message
-                #img_msg = br.cv2_to_imgmsg(frame, encoding='rgb8')
+            # Publish the image.
+            #self.pub.publish(img_msg)
+        cv2.imwrite("picam.jpg", frame)
+        print("Saving img")
 
-                # Publish the image.
-                #self.pub.publish(img_msg)
-                cv2.imwrite("picam.jpg", frame)
-
-                # Sleep just enough to maintain the desired rate
-                #rate.sleep()
+            # Sleep just enough to maintain the desired rate
+            #rate.sleep()
         cap.release()
         cv2.destroyAllWindows()
 
