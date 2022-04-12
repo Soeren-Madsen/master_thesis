@@ -27,7 +27,7 @@ class CameraPublisher(object):
         cap = cv2.VideoCapture(0)
 
 
-        while not rospy.is_shutdown():
+        while True:
             # Capture frame-by-frame
             # This method returns True/False as well as the video frame.
             ret, frame = cap.read()
