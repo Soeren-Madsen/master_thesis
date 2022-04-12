@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-import rospy # Python library for ROS
-from sensor_msgs.msg import Image # Image is the message type
+#import rospy # Python library for ROS
+#from sensor_msgs.msg import Image # Image is the message type
 import cv2
 
 class CameraPublisher(object):
     def __init__(self):
-        self.setup_cam()
+        #self.setup_cam()
         self.loop()
 
     def setup_cam(self):
@@ -14,10 +14,10 @@ class CameraPublisher(object):
         """
 
         # Tells rospy the name of the node.
-        rospy.init_node('camera_publisher', anonymous=True)
+        #rospy.init_node('camera_publisher', anonymous=True)
 
         # Publishing to the "video_frames" topic using the message type Image
-        self.pub = rospy.Publisher('/video_frames', Image, queue_size=10)
+        #self.pub = rospy.Publisher('/video_frames', Image, queue_size=10)
 
     def loop(self):
         # go through the loop 15 times per second
@@ -34,7 +34,7 @@ class CameraPublisher(object):
 
             if ret == True:
                 # Print debugging information to the terminal
-                rospy.loginfo('publishing video frame')
+                #rospy.loginfo('publishing video frame')
 
                 # converts an OpenCV image to a ROS image message
                 #img_msg = br.cv2_to_imgmsg(frame, encoding='rgb8')
@@ -44,13 +44,13 @@ class CameraPublisher(object):
                 cv2.imwrite("picam.jpg", frame)
 
                 # Sleep just enough to maintain the desired rate
-                rate.sleep()
+                #rate.sleep()
         cap.release()
         cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    try:
-        CameraPublisher()
-    except rospy.ROSInterruptException:
-        print("failed")
-        pass
+    
+    CameraPublisher()
+    #except rospy.ROSInterruptException:
+        #print("failed")
+        #pass
