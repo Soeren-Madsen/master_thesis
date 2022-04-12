@@ -17,6 +17,8 @@ if __name__ == '__main__':
     cam = Cam()
     i=0
     while True:
+        cv2.waitKey(0)
         frame = cam.get_img()
         cv2.imwrite("image" + i, frame)
-        cv2.waitKey(0)
+        print("Saving img")
+        i = i+1
