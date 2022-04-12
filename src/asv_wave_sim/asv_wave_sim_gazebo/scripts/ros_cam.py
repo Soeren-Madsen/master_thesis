@@ -10,4 +10,13 @@ class Cam():
             return frame
         else:
             print("no image")   
-        #cv2.imwrite('image.jpg', frame)
+
+
+
+if __name__ == '__main__':
+    cam = Cam()
+    i=0
+    while True:
+        frame = cam.get_img()
+        cv2.imwrite("image" + i, frame)
+        cv2.waitKey(0)
