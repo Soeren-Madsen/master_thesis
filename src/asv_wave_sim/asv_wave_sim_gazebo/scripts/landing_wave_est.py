@@ -16,16 +16,19 @@ from sensor_msgs.msg import NavSatFix, Imu, Image
 from kalman_ship import Kalman_est
 from pose_est_board_3d import Aruco_pose
 from scipy import signal
-from cv_bridge import CvBridge, CvBridgeError
+from ros_cam import Cam
 
 
 '''
 Denne siger hvordan PositionTarget skal sættes http://docs.ros.org/en/api/mavros_msgs/html/msg/PositionTarget.html 
+HUSK: Fjern Image fra ros på rigtig drone. Bruger class Cam i stedet til at få billedet.
+
 NÆSTE GANG: 
 - Find ud af hvad jeg gør hvis jeg ikke kan finde en aruco marker.
 - Få fremskaffet en bedre ground truth for at kunne lave test. Evt ent direkte model data frem. Lige nu bliver dist beregnet ud fra GPS kun, i sammenligning
 og gør så de bruger samme koord sys, så man ikke skal trække random værdi fra.
 - Lav samme log test som tidligere med den nye, for at se hvor godt den følger.
+
 '''
 
 class Drone():
@@ -57,6 +60,8 @@ class Drone():
 
         self.aru = Aruco_pose()
 
+        self.cam = Cam()
+
         #Lowpass filter:
         self.b = signal.firwin(25, 0.02)
         self.z = signal.lfilter_zi(self.b, 1)*0 #0 er start værdi for filteret
@@ -74,7 +79,6 @@ class Drone():
         self.land_client = rospy.ServiceProxy("/mavros/cmd/land", CommandTOL)
         self.takeoff_client = rospy.ServiceProxy("/mavros/cmd/takeoff", CommandTOL)
 
-        self.bridge = CvBridge()
 
         ## Subscribers:
         self.state_sub = rospy.Subscriber('/mavros/state', State, self.state_cb)
@@ -190,6 +194,8 @@ class Drone():
         return targetPosition
 
     def follow_ship(self):
+
+        #self.cv_image = self.cam.get_img() !!!!!!!!!!!!!!SKAL BRUGES PÅ DRONEN
 
         start = time.time()
         targetPosition = PositionTarget()
