@@ -21,7 +21,7 @@ class CameraPublisher(object):
 
     def loop(self):
         # go through the loop 15 times per second
-        rate = rospy.Rate(15)
+        #rate = rospy.Rate(15)
 
         # Create a VideoCapture object The argument '0' gets the default webcam.
         cap = cv2.VideoCapture(0)
