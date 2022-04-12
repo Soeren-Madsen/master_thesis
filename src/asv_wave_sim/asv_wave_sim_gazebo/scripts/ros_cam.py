@@ -5,7 +5,7 @@ class Cam():
         self.cap = cv2.VideoCapture(0)
 
     def get_img(self):
-        ret, frame = cap.read()
+        ret, frame = self.cap.read()
         if ret:
             return frame
         else:
@@ -17,8 +17,10 @@ if __name__ == '__main__':
     cam = Cam()
     i=0
     while True:
-        cv2.waitKey(0)
+        input("Press enter to continue...")
         frame = cam.get_img()
-        cv2.imwrite("image" + i, frame)
+        name = "image" + str(i) + ".jpg"
+        print(name)
+        cv2.imwrite(name, frame)
         print("Saving img")
         i = i+1
