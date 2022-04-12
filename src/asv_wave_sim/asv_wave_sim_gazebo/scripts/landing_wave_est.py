@@ -21,13 +21,19 @@ from ros_cam import Cam
 
 '''
 Denne siger hvordan PositionTarget skal sættes http://docs.ros.org/en/api/mavros_msgs/html/msg/PositionTarget.html 
-HUSK: Fjern Image fra ros på rigtig drone. Bruger class Cam i stedet til at få billedet.
+HUSK: 
+- Fjern Image fra ros på rigtig drone. Bruger class Cam i stedet til at få billedet.
+- Updatere x, y, z pos hvor den flyver hen til optitrack.
+
 
 NÆSTE GANG: 
 - Find ud af hvad jeg gør hvis jeg ikke kan finde en aruco marker.
 - Få fremskaffet en bedre ground truth for at kunne lave test. Evt ent direkte model data frem. Lige nu bliver dist beregnet ud fra GPS kun, i sammenligning
 og gør så de bruger samme koord sys, så man ikke skal trække random værdi fra.
 - Lav samme log test som tidligere med den nye, for at se hvor godt den følger.
+- Lav holder til kamera på dronen
+- Test Pi kamera ved brug af aruco markers
+- calibrate pi camera
 
 '''
 
