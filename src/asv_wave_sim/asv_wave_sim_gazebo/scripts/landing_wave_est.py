@@ -39,6 +39,8 @@ og gør så de bruger samme koord sys, så man ikke skal trække random værdi f
 
 class Drone():
     def __init__(self):
+        self.gazebo = True
+
         self.f_x = open("log_x.txt", 'a')
         self.f_v = open("log_v.txt", 'a')
         self.hz = 25
@@ -52,7 +54,10 @@ class Drone():
         self.receivedPosition = False
         #self.home_position = NavSatFix()
         #self.current_position = NavSatFix()
-        self.altitude = 4.
+        if self.gazebo:
+            self.altitude = 4.
+        else:
+            self.altitude = 3.
         self.uc = utmconv()
         self.setup_topics()
         self.kf = Kalman_est()
@@ -62,7 +67,10 @@ class Drone():
         self.allow_landing = False
         self.counter = 0
         self.max_alt_ship = 0
-        self.landing_speed = 1.5
+        if self.gazebo:
+            self.landing_speed = 1.5
+        else:
+            self.landing_speed = 1
 
         self.aru = Aruco_pose()
 
@@ -92,7 +100,8 @@ class Drone():
         self.pos_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.position_cb)
         self.target_pos_sub = rospy.Subscriber("/fix", NavSatFix, self.target_cb)
         self.imu_sub = rospy.Subscriber('/mavros/imu/data', Imu, self.imu_cb)
-        self.img_sub = rospy.Subscriber("/camera/color/image_raw", Image, self.image_cb)
+        if self.gazebo:
+            self.img_sub = rospy.Subscriber("/camera/color/image_raw", Image, self.image_cb)
 
         ## Publishers:
         self.target_pos_pub = rospy.Publisher("/mavros/setpoint_position/local", PoseStamped, queue_size=1)
@@ -118,19 +127,14 @@ class Drone():
 
     def target_cb(self, data):
         self.targetGPS = data
-        #print("longitude %f" % self.targetGPS.longitude)
         self.receivedGPS = True
 
     def imu_cb(self, data):
         self.current_imu = data
 
     def image_cb(self, img_msg):
-        # log some info about the image topic
-        
-
         # Try to convert the ROS Image message to a CV2 Image
         self.cv_image = np.frombuffer(img_msg.data, dtype=np.uint8).reshape(img_msg.height, img_msg.width, -1)
-        # Show the converted image
 
     def setup(self):
         print("Waiting for FCU connection...")
@@ -156,13 +160,14 @@ class Drone():
 
 
         print("Waiting for change mode to offboard")
-        print("Enabling OFFBOARD")
-        while not self.state.mode == "OFFBOARD": #FJERN DETTE I REAL LIFE
-            self.rate.sleep()
-            self.target_pos_pub.publish(self.takeOffPosition)
-            if not self.state.mode == "OFFBOARD":
-                self.set_mode_client(base_mode=0, custom_mode="OFFBOARD")
-                print("OFFBOARD enable")
+        if self.gazebo:
+            print("Enabling OFFBOARD")
+            while not self.state.mode == "OFFBOARD":
+                self.rate.sleep()
+                self.target_pos_pub.publish(self.takeOffPosition)
+                if not self.state.mode == "OFFBOARD":
+                    self.set_mode_client(base_mode=0, custom_mode="OFFBOARD")
+                    print("OFFBOARD enable")
 
         print("Rotorcraft arming")
         while not self.state.armed:
@@ -170,7 +175,6 @@ class Drone():
             if not self.state.armed:
                 self.arming_client(True)
 
-            # reached takeoff position
         header = Header()
         dist_to_takeoff_pos = 99999
         self.takeOffPosition.pose.position.z = self.altitude
@@ -180,8 +184,6 @@ class Drone():
             z = self.takeOffPosition.pose.position.z - self.current_position.pose.position.z
             dist_to_takeoff_pos = sqrt(x*x + y*y + z*z)
             header.stamp = rospy.Time.now()
-            #print(self.takeOffPosition.pose.position.altitude)
-            #print(self.current_position.altitude)
             self.takeOffPosition.header = header
             self.target_pos_pub.publish(self.takeOffPosition)
             self.rate.sleep()
@@ -194,14 +196,20 @@ class Drone():
     
     def set_target(self):
         targetPosition = PoseStamped()
-        targetPosition.pose.position.x = -50
-        targetPosition.pose.position.y = 0
-        targetPosition.pose.position.z = self.targetGPS.altitude - self.current_position_geo.altitude + self.altitude
+        if self.gazebo:
+            targetPosition.pose.position.x = -50
+            targetPosition.pose.position.y = 0
+            targetPosition.pose.position.z = self.targetGPS.altitude - self.current_position_geo.altitude + self.altitude
+        else:
+            targetPosition.pose.position.x = 0
+            targetPosition.pose.position.y = 0
+            targetPosition.pose.position.z = self.altitude
         return targetPosition
 
     def follow_ship(self):
 
-        #self.cv_image = self.cam.get_img() !!!!!!!!!!!!!!SKAL BRUGES PÅ DRONEN
+        if not self.gazebo:
+            self.cv_image = self.cam.get_img()
 
         start = time.time()
         targetPosition = PositionTarget()
@@ -212,11 +220,14 @@ class Drone():
         #targetPosition.pose.position.x = -50.
         #targetPosition.pose.position.y = 0.
 
-        targetPosition.position.x = -50
+        if self.gazebo:
+            targetPosition.position.x = -50 #Gazebo
+            dist =  self.current_position_geo.altitude - self.targetGPS.altitude-0.5
+        else:
+            targetPosition.position.x = 0 #Optitrack
         targetPosition.position.y = 0
-        dist =  self.current_position_geo.altitude - self.targetGPS.altitude-0.5
         dist_aruco = self.aru.calc_euler(self.cv_image) #Calculate distance to ship based on aruco markers
-        #print("Distance to ship: ", dist)
+        print("Distance to ship: ", dist)
         print("Distance to ship aruco: ", dist_aruco[0])
         #print("Dist dif: ", dist_aruco[0] - dist)
         #print("Altitude of drone: ", self.current_position.pose.position.z)
@@ -227,14 +238,15 @@ class Drone():
 
         st, self.z = signal.lfilter(self.b, 1, [x[3]], zi=self.z)
         self.f_v.write(','.join([str(self.current_position.pose.position.z), str(self.targetGPS.altitude - self.home_alt + 5.35), str(dist_aruco[0]), str(dist), str(x[1]), '\n']))
-        #self.f_v.write(',')
 
         #targetPosition.velocity.z = x[3] #No low pass filter
         targetPosition.velocity.z = st[0] #With low pass filter
 
         self.f_x.write(','.join([str(x[0]), str(x[1]), str(x[2]), str(x[3]), '\n']))
-
-        ship_alt = self.targetGPS.altitude - self.home_alt + 5.35
+        if self.gazebo:
+            ship_alt = self.targetGPS.altitude - self.home_alt + 5.35
+        else:
+            ship_alt = 0 #ÆNDRER TIL ALT AF PLATFORM!!!!!!!!!!!!!!
         if dist_aruco < self.altitude + 0.2:
             self.counter = self.counter + 1
             if ship_alt<self.max_alt_ship:
@@ -253,17 +265,13 @@ class Drone():
             
 
         end = time.time()
-        #print("Time taken: ", end-start)
+        print("Time taken: ", end-start)
         self.rate.sleep()
         
-        #if not self.image_ac and dist_aruco < 5.1:
-        #    cv2.imwrite('test.jpg', self.cv_image)
-        #    image_ac = True
-        #self.f_x.write(',')
 
         
 
-        return targetPosition#, targetVelocity
+        return targetPosition
         
 
     def distanceToTarget(self,targetPosition):
@@ -278,13 +286,8 @@ class Drone():
             header.stamp = rospy.Time.now()
             if self.landing_allowed:
                      
-                #target_pos, target_vel = self.follow_ship()
                 target_pos = self.follow_ship()
-                target_pos.header = header
-                #target_vel.header = header
-                #print("target_pos: ", target_pos.pose.position.z)
-                #print("target_vel: ", target_vel)            
-                #self.target_vel_pub.publish(target_vel)
+                target_pos.header = header    
                 #self.target_pos_pub.publish(target_pos)
 
                 self.target_pos_pub2.publish(target_pos)
@@ -296,6 +299,7 @@ class Drone():
                 print(self.distanceToTarget(target_pos))
                 if(self.distanceToTarget(target_pos) < self.dist_to_target_thresh):
                     self.landing_allowed = True
+                    #break
 
             self.rate.sleep()
 

@@ -13,11 +13,11 @@ import time
 class Aruco_pose():
     def __init__(self):
         # Side length of the ArUco marker in meters 
-        aruco_marker_side_length =0.055  #0.97 in gazebo #0.055 real life
-        aruco_marker_space = 0.014 #0.025 in gazebo #0.014 real life
+        aruco_marker_side_length =0.097  #0.097 in gazebo #0.055 real life
+        aruco_marker_space = 0.025 #0.025 in gazebo #0.014 real life
 
         # Calibration parameters yaml file
-        camera_calibration_parameters_filename = 'calibration_chessboard.yaml' #SKAL OPDATERES TIL GAZEBO!!!!!!!!!!!!!!!!! måske
+        camera_calibration_parameters_filename = 'calibration_chessboard.yaml' #Brug calibration_chessboard_real.yaml til virkelig flyvning!!!
 
         cv_file = cv2.FileStorage(camera_calibration_parameters_filename, cv2.FILE_STORAGE_READ) 
         self.mtx = cv_file.getNode('K').mat()
@@ -40,7 +40,8 @@ class Aruco_pose():
         #self.board = cv2.aruco.Board_create(board_corners,self.arucoDict, board_ids )
 
         #Creating a standard board, no custom
-        self.board = cv2.aruco.GridBoard_create(3, 3, aruco_marker_side_length, aruco_marker_space, self.arucoDict) #Change to 2,2 for gazebo
+        #self.board = cv2.aruco.GridBoard_create(3, 3, aruco_marker_side_length, aruco_marker_space, self.arucoDict) #Real life
+        self.board = cv2.aruco.GridBoard_create(2, 2, aruco_marker_side_length, aruco_marker_space, self.arucoDict) #Optitrack
 
         self.rvecs = None
         self.tvecs = None    
@@ -92,7 +93,7 @@ class Aruco_pose():
                     # Store the translation (i.e. position) information
                     transform_translation_x = tvecs[0]
                     transform_translation_y = tvecs[1]
-                    self.transform_translation_z = tvecs[2]# + 0.1 #The 0.7 is the difference of true measurement and aruco placement on the ship in gazebo
+                    self.transform_translation_z = tvecs[2] + 0.1 #The 0.7 is the difference of true measurement and aruco placement on the ship in gazebo
             
                     # Store the rotation information
                     rotation_matrix = np.eye(4)
