@@ -2,10 +2,10 @@ clear; clc;
 %v_pos_dist = importdata("log_v_pos_dist.txt");
 %v_vel_dist = importdata("log_v_vel_dist.txt");
 %v_vel_dist_lp = importdata("log_v_vel_dist_lp.txt");
-v_pos_dist = importdata("log_v_pos_dist_3_wave.txt");
-v_vel_dist = importdata("log_v_vel_dist_3_wave.txt");
-v_vel_dist_lp = importdata("log_v_vel_dist_lp_3_wave.txt");
-v_vel_aruco = importdata("log_v_vel_aruco_3_wave.txt");
+%v_pos_dist = importdata("log_v_pos_dist_3_wave.txt");
+%v_vel_dist = importdata("log_v_vel_dist_3_wave.txt");
+%v_vel_dist_lp = importdata("log_v_vel_dist_lp_3_wave.txt");
+%v_vel_aruco = importdata("log_v_vel_aruco_3_wave.txt");
 v_vel = importdata("log_v.txt");
 %x(:,1) = [];
 %v(:,1) = [];
@@ -61,7 +61,7 @@ v_vel = importdata("log_v.txt");
 % legend('drone pos', 'ship pos')
 
 figure(7)
-plot(v_vel(:,1)+5.95)
+plot(v_vel(:,1)-1)
 hold on
 plot(v_vel(:,2))
 

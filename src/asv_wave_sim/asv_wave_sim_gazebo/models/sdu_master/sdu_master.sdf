@@ -936,7 +936,6 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
-
     <!--include>      
       <pose>0 0 0 0 0 0</pose>
       <uri>model://landing_gear/landing_gear.urdf</uri>

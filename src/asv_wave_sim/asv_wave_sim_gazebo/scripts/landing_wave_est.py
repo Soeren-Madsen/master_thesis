@@ -17,23 +17,17 @@ from kalman_ship import Kalman_est
 from pose_est_board_3d import Aruco_pose
 from scipy import signal
 from ros_cam import Cam
+from gazebo_msgs.srv import GetModelState 
 
 
 '''
 Denne siger hvordan PositionTarget skal sættes http://docs.ros.org/en/api/mavros_msgs/html/msg/PositionTarget.html 
 HUSK: 
-- Fjern Image fra ros på rigtig drone. Bruger class Cam i stedet til at få billedet.
-- Updatere x, y, z pos hvor den flyver hen til optitrack.
 
 
 NÆSTE GANG: 
 - Find ud af hvad jeg gør hvis jeg ikke kan finde en aruco marker.
-- Få fremskaffet en bedre ground truth for at kunne lave test. Evt ent direkte model data frem. Lige nu bliver dist beregnet ud fra GPS kun, i sammenligning
-og gør så de bruger samme koord sys, så man ikke skal trække random værdi fra.
 - Lav samme log test som tidligere med den nye, for at se hvor godt den følger.
-- Lav holder til kamera på dronen
-- Test Pi kamera ved brug af aruco markers
-- calibrate pi camera
 
 '''
 
@@ -136,6 +130,7 @@ class Drone():
         # Try to convert the ROS Image message to a CV2 Image
         self.cv_image = np.frombuffer(img_msg.data, dtype=np.uint8).reshape(img_msg.height, img_msg.width, -1)
 
+
     def setup(self):
         print("Waiting for FCU connection...")
         while not self.state.connected:
@@ -207,6 +202,12 @@ class Drone():
         return targetPosition
 
     def follow_ship(self):
+        if self.gazebo:
+            self.model_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
+            model_ship = self.model_state("ship", "")
+            model_drone = self.model_state("sdu_master", "")
+            print("Drone z pos: ", model_drone.pose.position.z)
+            print("ship z pos: ", model_ship.pose.position.z)
 
         if not self.gazebo:
             self.cv_image = self.cam.get_img()
@@ -222,12 +223,12 @@ class Drone():
 
         if self.gazebo:
             targetPosition.position.x = -50 #Gazebo
-            dist =  self.current_position_geo.altitude - self.targetGPS.altitude-0.5
+            dist =  model_drone.pose.position.z - model_ship.pose.position.z
         else:
             targetPosition.position.x = 0 #Optitrack
         targetPosition.position.y = 0
         dist_aruco = self.aru.calc_euler(self.cv_image) #Calculate distance to ship based on aruco markers
-        print("Distance to ship: ", dist)
+        #print("Distance to ship: ", dist)
         print("Distance to ship aruco: ", dist_aruco[0])
         #print("Dist dif: ", dist_aruco[0] - dist)
         #print("Altitude of drone: ", self.current_position.pose.position.z)
@@ -237,22 +238,22 @@ class Drone():
         targetPosition.position.z = x[2] + self.altitude
 
         st, self.z = signal.lfilter(self.b, 1, [x[3]], zi=self.z)
-        self.f_v.write(','.join([str(self.current_position.pose.position.z), str(self.targetGPS.altitude - self.home_alt + 5.35), str(dist_aruco[0]), str(dist), str(x[1]), '\n']))
+        self.f_v.write(','.join([str(model_drone.pose.position.z), str(model_ship.pose.position.z), str(dist_aruco[0]), str(dist), str(x[1]), '\n']))
 
         #targetPosition.velocity.z = x[3] #No low pass filter
         targetPosition.velocity.z = st[0] #With low pass filter
 
         self.f_x.write(','.join([str(x[0]), str(x[1]), str(x[2]), str(x[3]), '\n']))
         if self.gazebo:
-            ship_alt = self.targetGPS.altitude - self.home_alt + 5.35
+            ship_alt = model_ship.pose.position.z
         else:
             ship_alt = 0 #ÆNDRER TIL ALT AF PLATFORM!!!!!!!!!!!!!!
         if dist_aruco < self.altitude + 0.2:
             self.counter = self.counter + 1
             if ship_alt<self.max_alt_ship:
                 self.max_alt_ship = ship_alt
-        print("ship min alt: ", self.max_alt_ship)
-        print("ship alt: ", ship_alt)
+        #print("ship min alt: ", self.max_alt_ship)
+        #print("ship alt: ", ship_alt)
         
         
         if self.counter > 200 and ship_alt < 0.9*self.max_alt_ship:
@@ -265,7 +266,7 @@ class Drone():
             
 
         end = time.time()
-        print("Time taken: ", end-start)
+        #print("Time taken: ", end-start)
         self.rate.sleep()
         
 
