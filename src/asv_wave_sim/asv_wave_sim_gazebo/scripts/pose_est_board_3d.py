@@ -13,11 +13,11 @@ import time
 class Aruco_pose():
     def __init__(self):
         # Side length of the ArUco marker in meters 
-        aruco_marker_side_length =0.097 #0.092 #0.17 in gazebo
-        aruco_marker_space = 0.025 #0.014 #0.04 in gazebo
+        aruco_marker_side_length =0.055  #0.97 in gazebo #0.055 real life
+        aruco_marker_space = 0.014 #0.025 in gazebo #0.014 real life
 
         # Calibration parameters yaml file
-        camera_calibration_parameters_filename = 'calibration_chessboard.yaml' #SKAL OPDATERES TIL GAZEBO!!!!!!!!!!!!!!!!!
+        camera_calibration_parameters_filename = 'calibration_chessboard.yaml' #SKAL OPDATERES TIL GAZEBO!!!!!!!!!!!!!!!!! måske
 
         cv_file = cv2.FileStorage(camera_calibration_parameters_filename, cv2.FILE_STORAGE_READ) 
         self.mtx = cv_file.getNode('K').mat()
@@ -40,7 +40,7 @@ class Aruco_pose():
         #self.board = cv2.aruco.Board_create(board_corners,self.arucoDict, board_ids )
 
         #Creating a standard board, no custom
-        self.board = cv2.aruco.GridBoard_create(2, 2, aruco_marker_side_length, aruco_marker_space, self.arucoDict)
+        self.board = cv2.aruco.GridBoard_create(3, 3, aruco_marker_side_length, aruco_marker_space, self.arucoDict) #Change to 2,2 for gazebo
 
         self.rvecs = None
         self.tvecs = None    
@@ -86,50 +86,59 @@ class Aruco_pose():
 
             if success > 0:
                 frame = cv2.aruco.drawAxis(frame, self.mtx, self.dst, rvecs, tvecs, 0.05)
+            
+                for i, marker_id in enumerate(marker_ids):
+            
+                    # Store the translation (i.e. position) information
+                    transform_translation_x = tvecs[0]
+                    transform_translation_y = tvecs[1]
+                    self.transform_translation_z = tvecs[2]# + 0.1 #The 0.7 is the difference of true measurement and aruco placement on the ship in gazebo
+            
+                    # Store the rotation information
+                    rotation_matrix = np.eye(4)
+                    try:
+                        print("test")
+                        rotation_matrix[0:3, 0:3] = cv2.Rodrigues(rvecs)[0]
+                        r = R.from_matrix(rotation_matrix[0:3, 0:3])
+                        quat = r.as_quat()   
+                        print("test2")
+                        # Quaternion format     
+                        transform_rotation_x = quat[0] 
+                        transform_rotation_y = quat[1] 
+                        transform_rotation_z = quat[2] 
+                        transform_rotation_w = quat[3]
+                        print("test3") 
+                        # Euler angle format in radians
+                        roll_x, pitch_y, yaw_z = self.euler_from_quaternion(transform_rotation_x, 
+                                                                        transform_rotation_y, 
+                                                                        transform_rotation_z, 
+                                                                        transform_rotation_w)
+                        print("test4")
+                        roll_x = math.degrees(roll_x)
+                        print("test5")
+                        pitch_y = math.degrees(pitch_y)
+                        print("test6")
+                        yaw_z = math.degrees(yaw_z)
+                        print("test7")
+                        #print("transform_translation_x: {}".format(transform_translation_x))
+                        #print("transform_translation_y: {}".format(transform_translation_y))
+                        print("transform_translation_z: {}".format(self.transform_translation_z))
+                        print("test")
+                        print("roll_x: {}".format(roll_x))
+                        print("pitch_y: {}".format(pitch_y))
+                        print("yaw_z: {}".format(yaw_z))
+                        #print("quaternion 1: {}".format(quat[0]))
+                        #print("quaternion 2: {}".format(quat[1]))
+                        #print("quaternion 3: {}".format(quat[2]))
+                        #print("quaternion 4: {}".format(quat[3]))
+                        
+                        # Draw the axes on the marker
+                        #cv2.aruco.drawAxis(frame, mtx, dst, rvecs[i], tvecs[i], 0.05)
+                    except:
+                        print("Something went wrong with Rodrigues")
+
             else:
                 print("No Aruco markers found!")
-            for i, marker_id in enumerate(marker_ids):
-        
-                # Store the translation (i.e. position) information
-                transform_translation_x = tvecs[0]
-                transform_translation_y = tvecs[1]
-                self.transform_translation_z = tvecs[2] + 0.1 #The 0.7 is the difference of true measurement and aruco placement on the ship in gazebo
-        
-                # Store the rotation information
-                rotation_matrix = np.eye(4)
-                try:
-                    rotation_matrix[0:3, 0:3] = cv2.Rodrigues(rvecs)[0]
-                    r = R.from_matrix(rotation_matrix[0:3, 0:3])
-                    quat = r.as_quat()   
-                    
-                    # Quaternion format     
-                    transform_rotation_x = quat[0] 
-                    transform_rotation_y = quat[1] 
-                    transform_rotation_z = quat[2] 
-                    transform_rotation_w = quat[3] 
-                    # Euler angle format in radians
-                    roll_x, pitch_y, yaw_z = self.euler_from_quaternion(transform_rotation_x, 
-                                                                    transform_rotation_y, 
-                                                                    transform_rotation_z, 
-                                                                    transform_rotation_w)
-                    roll_x = math.degrees(roll_x)
-                    pitch_y = math.degrees(pitch_y)
-                    yaw_z = math.degrees(yaw_z)
-                    #print("transform_translation_x: {}".format(transform_translation_x))
-                    #print("transform_translation_y: {}".format(transform_translation_y))
-                    #print("transform_translation_z: {}".format(transform_translation_z))
-                    #print("roll_x: {}".format(roll_x))
-                    #print("pitch_y: {}".format(pitch_y))
-                    #print("yaw_z: {}".format(yaw_z))
-                    #print("quaternion 1: {}".format(quat[0]))
-                    #print("quaternion 2: {}".format(quat[1]))
-                    #print("quaternion 3: {}".format(quat[2]))
-                    #print("quaternion 4: {}".format(quat[3]))
-                    
-                    # Draw the axes on the marker
-                    #cv2.aruco.drawAxis(frame, mtx, dst, rvecs[i], tvecs[i], 0.05)
-                except:
-                    print("Something went wrong with Rodrigues")
 
         #cv2.imshow('frame',frame)
         return self.transform_translation_z #Using last value if no aruco marker is detected
@@ -144,7 +153,7 @@ def main():
     
         ret, frame = cap.read()
         aru.calc_euler(frame)
-        #cv2.imshow('frame', frame)
+        cv2.imshow('frame', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
