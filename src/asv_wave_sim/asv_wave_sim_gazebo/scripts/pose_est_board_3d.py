@@ -121,9 +121,9 @@ class Aruco_pose():
                         #print("test6")
                         yaw_z = math.degrees(yaw_z)
                         #print("test7")
-                        #print("transform_translation_x: {}".format(transform_translation_x))
-                        #print("transform_translation_y: {}".format(transform_translation_y))
-                        #print("transform_translation_z: {}".format(self.transform_translation_z))
+                        print("transform_translation_x: {}".format(transform_translation_x))
+                        print("transform_translation_y: {}".format(transform_translation_y))
+                        print("transform_translation_z: {}".format(self.transform_translation_z))
                         #print("test")
                         #print("roll_x: {}".format(roll_x))
                         #print("pitch_y: {}".format(pitch_y))
@@ -154,9 +154,9 @@ def main():
     
         ret, frame = cap.read()
         aru.calc_euler(frame)
-        #cv2.imshow('frame', frame)
-        #if cv2.waitKey(1) & 0xFF == ord('q'):
-            #break
+        cv2.imshow('frame', frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
     
     # Close down the video stream

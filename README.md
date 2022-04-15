@@ -68,3 +68,5 @@ roslaunch mavros px4.launch fcu_url:="/dev/ttyUSB0:921600"
 screen igen
 rosrun topic_tools relay /vrpn_client_node/thesis/pose /mavros/vision_pose/pose
 
+Husk at ændre calibration yaml filen i pose_est_board_3d.py
+

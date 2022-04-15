@@ -28,6 +28,7 @@ HUSK:
 NÆSTE GANG: 
 - Find ud af hvad jeg gør hvis jeg ikke kan finde en aruco marker.
 - Lav samme log test som tidligere med den nye, for at se hvor godt den følger.
+- Få den til at flyve hen til bådens x,y baseret på aruco marker i stedet for hardcode værdien.
 
 '''
 
@@ -221,13 +222,14 @@ class Drone():
         #targetPosition.pose.position.x = -50.
         #targetPosition.pose.position.y = 0.
 
+        
+        dist_aruco = self.aru.calc_euler(self.cv_image) #Calculate distance to ship based on aruco markers
         if self.gazebo:
-            targetPosition.position.x = -50 #Gazebo
+            targetPosition.position.x = -50# - dist_x #Gazebo
             dist =  model_drone.pose.position.z - model_ship.pose.position.z
         else:
             targetPosition.position.x = 0 #Optitrack
-        targetPosition.position.y = 0
-        dist_aruco = self.aru.calc_euler(self.cv_image) #Calculate distance to ship based on aruco markers
+        targetPosition.position.y = 0# + dist_y
         #print("Distance to ship: ", dist)
         print("Distance to ship aruco: ", dist_aruco[0])
         #print("Dist dif: ", dist_aruco[0] - dist)
@@ -256,7 +258,7 @@ class Drone():
         #print("ship alt: ", ship_alt)
         
         
-        if self.counter > 200 and ship_alt < 0.9*self.max_alt_ship:
+        if self.counter > 200:# and ship_alt < 0.9*self.max_alt_ship:
             self.allow_landing = True
             
 
