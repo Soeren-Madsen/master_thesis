@@ -53,3 +53,18 @@ rosrun gazebo_ros spawn_model -file `pwd`/src/asv_wave_sim/asv_wave_sim_gazebo/w
 
 Hector plugins til gazebo skal installeres før GPS til båden + drone virker
 
+
+
+OPTITRACK
+Skal køre commandoen:
+source /opt/ros/noetic/setup.bash
+før start
+MAV_1_CONFIG skal ændres til telem2!!!!!!!!!!!!!!!
+
+Screen (efterfulgt af 2x enter)
+roslaunch vrpn_client_ros sample.launch server:=192.168.0.50
+Screen igen
+roslaunch mavros px4.launch fcu_url:="/dev/ttyUSB0:921600"
+screen igen
+rosrun topic_tools relay /vrpn_client_node/thesis/pose /mavros/vision_pose/pose
+
