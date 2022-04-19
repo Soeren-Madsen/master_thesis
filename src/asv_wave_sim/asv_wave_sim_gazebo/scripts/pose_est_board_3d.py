@@ -13,11 +13,11 @@ import time
 class Aruco_pose():
     def __init__(self):
         # Side length of the ArUco marker in meters 
-        aruco_marker_side_length =0.097  #0.097 in gazebo #0.055 real life
-        aruco_marker_space = 0.025 #0.025 in gazebo #0.014 real life
+        aruco_marker_side_length =0.092  #0.097 in gazebo #0.055 real life
+        aruco_marker_space = 0.01 #0.025 in gazebo #0.014 real life
 
         # Calibration parameters yaml file
-        camera_calibration_parameters_filename = 'calibration_chessboard.yaml' #Brug calibration_chessboard_real.yaml til virkelig flyvning!!!
+        camera_calibration_parameters_filename = 'calibration_chessboard_real.yaml' #Brug calibration_chessboard_real.yaml til virkelig flyvning!!!
 
         cv_file = cv2.FileStorage(camera_calibration_parameters_filename, cv2.FILE_STORAGE_READ) 
         self.mtx = cv_file.getNode('K').mat()
@@ -47,6 +47,7 @@ class Aruco_pose():
         self.tvecs = None    
 
         self.transform_translation_z = 10
+        self.yaw_z = 0
 
 
 
@@ -98,36 +99,28 @@ class Aruco_pose():
                     # Store the rotation information
                     rotation_matrix = np.eye(4)
                     try:
-                        #print("test")
                         rotation_matrix[0:3, 0:3] = cv2.Rodrigues(rvecs)[0]
                         r = R.from_matrix(rotation_matrix[0:3, 0:3])
                         quat = r.as_quat()   
-                        #print("test2")
                         # Quaternion format     
                         transform_rotation_x = quat[0] 
                         transform_rotation_y = quat[1] 
                         transform_rotation_z = quat[2] 
                         transform_rotation_w = quat[3]
-                        #print("test3") 
                         # Euler angle format in radians
-                        roll_x, pitch_y, yaw_z = self.euler_from_quaternion(transform_rotation_x, 
+                        roll_x, pitch_y, self.yaw_z = self.euler_from_quaternion(transform_rotation_x, 
                                                                         transform_rotation_y, 
                                                                         transform_rotation_z, 
                                                                         transform_rotation_w)
-                        #print("test4")
                         roll_x = math.degrees(roll_x)
-                        #print("test5")
                         pitch_y = math.degrees(pitch_y)
-                        #print("test6")
-                        yaw_z = math.degrees(yaw_z)
-                        #print("test7")
-                        print("transform_translation_x: {}".format(transform_translation_x))
-                        print("transform_translation_y: {}".format(transform_translation_y))
-                        print("transform_translation_z: {}".format(self.transform_translation_z))
-                        #print("test")
+                        self.yaw_z = math.degrees(self.yaw_z)
+                        #print("transform_translation_x: {}".format(transform_translation_x))
+                        #print("transform_translation_y: {}".format(transform_translation_y))
+                        #print("transform_translation_z: {}".format(self.transform_translation_z))
                         #print("roll_x: {}".format(roll_x))
                         #print("pitch_y: {}".format(pitch_y))
-                        #print("yaw_z: {}".format(yaw_z))
+                        #print("yaw_z: {}".format(self.yaw_z))
                         #print("quaternion 1: {}".format(quat[0]))
                         #print("quaternion 2: {}".format(quat[1]))
                         #print("quaternion 3: {}".format(quat[2]))
@@ -140,9 +133,10 @@ class Aruco_pose():
 
             else:
                 print("No Aruco markers found!")
+                success = False
 
         #cv2.imshow('frame',frame)
-        return self.transform_translation_z #Using last value if no aruco marker is detected
+        return success, self.transform_translation_z, self.yaw_z #Using last value if no aruco marker is detected
 
  
 def main():
