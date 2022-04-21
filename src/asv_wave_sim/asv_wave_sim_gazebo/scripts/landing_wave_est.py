@@ -35,7 +35,7 @@ NÆSTE GANG:
 
 class Drone():
     def __init__(self):
-        self.gazebo = True
+        self.gazebo = False
 
         self.f_x = open("log_x.txt", 'a')
         self.f_v = open("log_v.txt", 'a')
