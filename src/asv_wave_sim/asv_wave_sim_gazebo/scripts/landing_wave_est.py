@@ -326,7 +326,10 @@ class Drone():
                 self.target_pos_pub.publish(target_pos)
                 print(self.distanceToTarget(target_pos))
                 if(self.distanceToTarget(target_pos) < self.dist_to_target_thresh):
-                    self.landing_allowed = True
+                    if not self.gazebo:
+                        self.cv_image = self.cam.get_img()
+                        success, dist_aruco, yaw = self.aru.calc_euler(self.cv_image)
+                    #self.landing_allowed = True
                     #break
 
             self.rate.sleep()
