@@ -33,7 +33,7 @@ class Kalman_est():
         #self.f.P *= 1000. #Initial covariance
         self.f.B = self.B
         self.f.R = np.array([[0.1, 0],[0,0.1]])
-        self.f.Q = np.array([[self.dt**2, self.dt, 0, 0, 0],[self.dt, self.dt**2, 0, 0, 0], [0, 0, self.dt**4/4, self.dt**3/2, self.dt**2/2], [0, 0, self.dt**3/2, self.dt**2, self.dt], [0, 0, self.dt**2/2, self.dt, 1]])
+        self.f.Q = np.array([[self.dt**4/4, self.dt**3/2, 0, 0, 0],[self.dt**3/2, self.dt**2, 0, 0, 0], [0, 0, self.dt**4/4, self.dt**3/2, self.dt**2/2], [0, 0, self.dt**3/2, self.dt**2, self.dt], [0, 0, self.dt**2/2, self.dt, 1]])
         self.f.Q *= 3**2
         #self.f.Q = np.array([[1000, 0, 0, 0, 0],[0, 1000, 0, 0, 0], [0, 0, 1000, 0, 0], [0, 0, 0, 3000, 0], [0, 0, 0, 0, 9000]])
         self.u = 0
