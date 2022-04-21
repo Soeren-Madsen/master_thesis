@@ -29,6 +29,7 @@ NÆSTE GANG:
 - Lav samme log test som tidligere med den nye, for at se hvor godt den følger.
 - Få den til at flyve hen til bådens x,y baseret på aruco marker i stedet for hardcode værdien.
 - Tag højde for roll og pitch. Yaw justerer sig selv.
+- Måske lav trajectory generation, hvis jeg kan predict motion table. 
 
 '''
 
