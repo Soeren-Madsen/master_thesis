@@ -1,17 +1,19 @@
 clear; clc;
 format compact;
 
+%INDSÆT SÅ DRONEN STOPPER NÅR DEN RAMMER BÅDEN
+
 %General parameters:
 t0=0;
 freq = 1;
-A = 0.3;
+A = 0.5;
 freq2 = 2;
-A2 = 0.2;
-freq3 = 0.5;
-A3 = 0.5;
+A2 = 0.7;
+freq3 = 0.7;
+A3 = 1.5;
 
 %Drone parameters:
-z_t0 = 10;
+z_t0 = 6;
 z_dot_t0 = 0;
 
 %Platform parameters:
@@ -28,17 +30,16 @@ syms tau;
 
 %calculation loop:
 t = t0;
-dt = 0.05;
+dt = 0.02;
 z_ref = z_t0;
 zd_vec = zd_hat;
 za_ddot_plot = 0;
 za_dot_plot = 0;
 za_plot = 0;
 t_plot = t;
-while t < 7.01
+while t < 4.51
     zd_d_tau = zd_dot(tau,freq,A) + zd_dot(tau,freq2,A2) + zd_dot(tau,freq3,A3);
     zd_d_t = zd_dot(t,freq,A) + zd_dot(t,freq2,A2) + zd_dot(t,freq3,A3);
-    
     eqn = za_dot + zrmax_ddot*(tau-t)-zd_d_tau+zd_d_t == 0;
     tf = vpasolve(eqn);
     zd_tf = zd(tf,freq,A) + zd(tf,freq2,A2) + zd(tf,freq3,A3);
@@ -50,7 +51,7 @@ while t < 7.01
     
     zd_dd = zd_ddot(t,freq,A) + zd_ddot(t,freq2,A2) + zd_ddot(t,freq3,A3);
     
-    if za_tau <= 0 %Break
+    if za_tau <= 0.05 %Break
         za_ddot =  zrmax_ddot - zd_dd;
     elseif za_tau > 0
         if za_dot <= -zrmax_dot - zd_d_t
@@ -59,12 +60,12 @@ while t < 7.01
             za_ddot =  -zrmax_ddot - zd_dd;
         end
     end
-    t=t+dt;
+    t=t+dt
     za_dot = za_dot+ za_ddot*dt;
     za=za + za_dot*dt+1/2*za_ddot*dt^2;
     
     zd_vec = [zd_vec, zd_t];
-    zr = za+zd_t
+    zr = za+zd_t;
     z_ref = [z_ref, za+zd_t];
     za_ddot_plot = [za_ddot_plot, za_ddot];
     za_dot_plot = [za_dot_plot, za_dot];

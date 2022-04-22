@@ -17,7 +17,8 @@ from kalman_ship import Kalman_est
 from pose_est_board_3d import Aruco_pose
 from scipy import signal
 from ros_cam import Cam
-from gazebo_msgs.srv import GetModelState 
+from gazebo_msgs.srv import GetModelState, SetModelState, SetLinkState
+from gazebo_msgs.msg import ModelState, LinkState
 
 
 '''
@@ -30,12 +31,15 @@ NÆSTE GANG:
 - Få den til at flyve hen til bådens x,y baseret på aruco marker i stedet for hardcode værdien.
 - Tag højde for roll og pitch. Yaw justerer sig selv.
 - Måske lav trajectory generation, hvis jeg kan predict motion table. 
+- Måske lav noget der resetter link i gazebo. Skal sætte model state orientation til 0 inden link state bliver ændret, ellers ændres baseline.
+- Skal kunne følge båden mens den korriger for yaw
+- Skal stoppe med at bruge aruco når den kommer under 1 meter
 
 '''
 
 class Drone():
     def __init__(self):
-        self.gazebo = False
+        self.gazebo = True
 
         self.f_x = open("log_x.txt", 'a')
         self.f_v = open("log_v.txt", 'a')
@@ -101,6 +105,8 @@ class Drone():
         self.imu_sub = rospy.Subscriber('/mavros/imu/data', Imu, self.imu_cb)
         if self.gazebo:
             self.img_sub = rospy.Subscriber("/camera/color/image_raw", Image, self.image_cb)
+            self.set_state = rospy.ServiceProxy('/gazebo/set_model_state', SetModelState)
+            self.set_link = rospy.ServiceProxy('/gazebo/set_link_state', SetLinkState)
 
         ## Publishers:
         self.target_pos_pub = rospy.Publisher("/mavros/setpoint_position/local", PoseStamped, queue_size=1)
@@ -236,7 +242,7 @@ class Drone():
         targetPosition.position.y = 0
         if success:
             print("yaw: ", yaw)
-            if abs(yaw) < 5: 
+            if abs(yaw) < 360: 
                 targetPosition.yaw = self.aru.euler_from_quaternion(self.current_position.pose.orientation.x, self.current_position.pose.orientation.y, self.current_position.pose.orientation.z, self.current_position.pose.orientation.w)[2]
                 if not self.gazebo and not self.alt_flag:
                     self.altitude = 2
@@ -245,7 +251,8 @@ class Drone():
                 print("Distance to ship aruco: ", dist_aruco[0])
                 #print("Dist dif: ", dist_aruco[0] - dist)
                 #print("Altitude of drone: ", self.current_position.pose.position.z)
-                x = self.kf.update_predict(dist_aruco[0], self.current_position.pose.position.z)
+                #x = self.kf.update_predict(dist_aruco[0], self.current_position.pose.position.z)
+                x = self.kf.update_predict(dist, self.current_position.pose.position.z)
                 
                 #targetPosition.pose.position.z = x[2] + self.altitude
                 targetPosition.position.z = x[2] + self.altitude
@@ -301,6 +308,56 @@ class Drone():
 
         return targetPosition
         
+    def landing_gear_move(self):
+        state_msg = ModelState()
+        state_msg.model_name = 'sdu_master::landing'
+        #state_msg.pose.position.x = 0
+        #state_msg.pose.position.y = 0
+        #state_msg.pose.position.z = 0.3
+        roll = 0.0
+        pitch = 0.0
+        yaw = 0.0
+        ori = self.quaternion_from_euler(roll, pitch, yaw)
+        state_msg.pose.orientation.x = ori[0]
+        state_msg.pose.orientation.y = ori[1]
+        state_msg.pose.orientation.z = ori[2]
+        state_msg.pose.orientation.w = ori[3]
+        state_msg.reference_frame = 'sdu_master'
+        print("waiting for model state")
+        rospy.wait_for_service('/gazebo/set_model_state')
+        print("Changing state")
+        resp = self.set_state(state_msg)
+
+    def reset_link(self):
+        ori = self.quaternion_from_euler(0, 0, 0.785)
+        link_msg = LinkState()
+        link_msg.link_name = 'sdu_master::landing::landing_gear'
+        link_msg.pose.position.x = 0
+        link_msg.pose.position.y = 0
+        link_msg.pose.position.z = 0
+        link_msg.pose.orientation.x = 0.0#ori[0]
+        link_msg.pose.orientation.y = 0.0#ori[1]
+        link_msg.pose.orientation.z = 0.0#ori[2]
+        link_msg.pose.orientation.w = 0.0#ori[3]
+        link_msg.twist.linear.x = 0
+        link_msg.twist.linear.y = 0
+        link_msg.twist.linear.z = 0
+        link_msg.twist.angular.x = 0
+        link_msg.twist.angular.y = 0
+        link_msg.twist.angular.z = 0
+        link_msg.reference_frame = 'sdu_master::landing::landing_gear'
+        rospy.wait_for_service('/gazebo/set_link_state')
+        resp = self.set_link(link_msg)
+        #time.sleep(1)
+        
+
+    def quaternion_from_euler(self, roll, pitch, yaw): #Angle in radians
+        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        
+        return [qx, qy, qz, qw]
 
     def distanceToTarget(self,targetPosition):
         x = targetPosition.pose.position.x - self.current_position.pose.position.x
@@ -324,12 +381,14 @@ class Drone():
                 target_pos = self.set_target()
                 target_pos.header = header
                 self.target_pos_pub.publish(target_pos)
-                print(self.distanceToTarget(target_pos))
+                #print(self.distanceToTarget(target_pos))
                 if(self.distanceToTarget(target_pos) < self.dist_to_target_thresh):
                     if not self.gazebo:
                         self.cv_image = self.cam.get_img()
                         success, dist_aruco, yaw = self.aru.calc_euler(self.cv_image)
-                    #self.landing_allowed = True
+                    self.landing_allowed = True
+                    #self.reset_link()
+                    #self.landing_gear_move()
                     #break
 
             self.rate.sleep()

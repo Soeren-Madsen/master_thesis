@@ -70,3 +70,30 @@ rosrun topic_tools relay /vrpn_client_node/thesis/pose /mavros/vision_pose/pose
 
 Husk at ændre calibration yaml filen i pose_est_board_3d.py
 
+
+
+For at ændre landings platform. Få dronen til at hover i et par sekunder og kør så nedenstående inden man prøver at ændre på roll/pitch.
+
+rosservice call /gazebo/set_link_state "link_state:
+  link_name: 'sdu_master::landing::landing_gear'
+  pose:
+    position:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    orientation:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      w: 1.0
+  twist:
+    linear:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+    angular:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+  reference_frame: ''" 
+

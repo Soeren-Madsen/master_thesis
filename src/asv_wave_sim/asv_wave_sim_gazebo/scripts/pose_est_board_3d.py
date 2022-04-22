@@ -17,7 +17,7 @@ class Aruco_pose():
         aruco_marker_space = 0.01 #0.025 in gazebo #0.014 real life
 
         # Calibration parameters yaml file
-        camera_calibration_parameters_filename = 'calibration_chessboard_real.yaml' #Brug calibration_chessboard_real.yaml til virkelig flyvning!!!
+        camera_calibration_parameters_filename = 'calibration_chessboard.yaml' #Brug calibration_chessboard_real.yaml til virkelig flyvning!!!
 
         cv_file = cv2.FileStorage(camera_calibration_parameters_filename, cv2.FILE_STORAGE_READ) 
         self.mtx = cv_file.getNode('K').mat()
@@ -117,10 +117,10 @@ class Aruco_pose():
                         self.yaw_z = math.degrees(self.yaw_z)
                         #print("transform_translation_x: {}".format(transform_translation_x))
                         #print("transform_translation_y: {}".format(transform_translation_y))
-                        print("transform_translation_z: {}".format(self.transform_translation_z))
-                        print("roll_x: {}".format(roll_x))
-                        print("pitch_y: {}".format(pitch_y))
-                        print("yaw_z: {}".format(self.yaw_z))
+                        #print("transform_translation_z: {}".format(self.transform_translation_z))
+                        #print("roll_x: {}".format(roll_x))
+                        #print("pitch_y: {}".format(pitch_y))
+                        #print("yaw_z: {}".format(self.yaw_z))
                         #print("quaternion 1: {}".format(quat[0]))
                         #print("quaternion 2: {}".format(quat[1]))
                         #print("quaternion 3: {}".format(quat[2]))
@@ -134,6 +134,8 @@ class Aruco_pose():
             else:
                 print("No Aruco markers found!")
                 success = False
+        else:
+            success = False
 
         #cv2.imshow('frame',frame)
         return success, self.transform_translation_z, self.yaw_z #Using last value if no aruco marker is detected

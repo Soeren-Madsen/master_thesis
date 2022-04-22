@@ -165,6 +165,45 @@
         <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
     </joint-->
+<!--model name = 'landing'>
+<gravity>0</gravity>
+<link name='landing_gear'>
+      <pose> 0.0 0.0 -0.4 0 0 0 </pose>
+      <inertial>
+        <mass>0.00001</mass>
+        <inertia>
+          <ixx>0.00000003643274</ixx>
+          <iyy>0.00000004857971</iyy>
+          <izz>0.00000002805359</izz>
+        </inertia>
+      </inertial>
+      <visual name='landing_gear_visual'>
+        <pose> 0.1 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>0.15 0.15 0.15</scale>
+            <uri>model://sdu_master/meshes/landing_gear.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+    </link>
+    <joint name='landing_gear_joint' type='universal'>
+      <child>landing::landing_gear</child>
+      <parent>base_link</parent>
+	<axis>
+	<xyz>1 1 0</xyz>
+	<use_parent_model_frame>1</use_parent_model_frame>
+	</axis>
+	<limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>999999</spring_stiffness>
+        </dynamics>
+    </joint>
+</model-->
       
     <!-- Rotor 0 (CW) -->
     <link name='rotor_0'>
@@ -936,11 +975,7 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
-    <!--include>      
-      <pose>0 0 0 0 0 0</pose>
-      <uri>model://landing_gear/landing_gear.urdf</uri>
-      <name>landing_gear0</name>
-    </include-->
+
 
   </model>
 </sdf>
