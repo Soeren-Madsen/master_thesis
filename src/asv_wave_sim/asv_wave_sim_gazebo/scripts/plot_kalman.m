@@ -5,28 +5,33 @@ clear; clc;
 %v_pos_dist = importdata("log_v_pos_dist_3_wave.txt");
 %v_vel_dist = importdata("log_v_vel_dist_3_wave.txt");
 %v_vel_dist_lp = importdata("log_v_vel_dist_lp_3_wave.txt");
-%v_vel_aruco = importdata("log_v_vel_aruco_3_wave.txt");
+v_vel_aruco = importdata("log_v_vel_aruco_3_wave.txt");
+v_land = importdata("log_v_good_land.txt");
 v_vel = importdata("log_v.txt");
+x = importdata("log_x.txt");
 %x(:,1) = [];
 %v(:,1) = [];
-%x(1,:) = [];
+x(1:10,:) = [];
 %v(1,:) = [];
 
-% figure(1)
-% subplot(2,2,1)
-% plot(x(:,1)-5)
-% hold on;
-% plot(x(:,3))
-% title('altitude drone')
-% subplot(2,2,2)
-% plot(x(:,2))
-% title('velocity drone')
-% subplot(2,2,3)
-% plot(x(:,3))
-% title('altitude ship')
-% subplot(2,2,4)
-% plot(x(:,4))
-% title('velocity ship')
+figure(1)
+subplot(2,3,1)
+plot(x(:,1)-5)
+hold on;
+plot(x(:,3))
+title('altitude drone')
+subplot(2,3,2)
+plot(x(:,2))
+title('velocity drone')
+subplot(2,3,3)
+plot(x(:,3))
+title('altitude ship')
+subplot(2,3,4)
+plot(x(:,4))
+title('velocity ship')
+subplot(2,3,5)
+plot(x(:,5))
+title('acceleration ship')
 
 % figure(2)
 % plot(v(:,1))
@@ -61,9 +66,15 @@ v_vel = importdata("log_v.txt");
 % legend('drone pos', 'ship pos')
 
 figure(7)
-plot(v_vel(:,1)-1)
+plot(v_vel(:,4), v_vel(:,1)-1.12-(4-1.12))
 hold on
-plot(v_vel(:,2))
+plot(v_vel(:,4), v_vel(:,2))
+
+% figure(8)
+% plot(v_land(:,1))
+% hold on;
+% plot(v_land(:,2)-6)
+% legend('drone pos', 'ship pos')
 
 %%
 avg_dist_pos = mean(abs(v_pos_dist(1:800,3)-5))

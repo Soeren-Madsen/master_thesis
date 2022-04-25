@@ -1,15 +1,17 @@
 import numpy as np
+import time
 from filterpy.kalman import KalmanFilter
 import filterpy as fp
 import math
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+import copy
 
 A1=1
 A2 = 0.5
 A3 = 1
 
-dt = 0.25
+dt = 1/12.5 #0.25
 
 freq1=1
 freq2 = 0.3
@@ -17,11 +19,14 @@ freq3 = 0.5
 
 drone_al = 10
 
+predict_times = int(1/dt)
+
 class Kalman_est():
     def __init__(self):
         self.dt = dt
         self.A = np.array([[1, self.dt, 0, 0, 0], [0, 1, 0, 0, 0,], [0, 0, 1, self.dt, 1/2*self.dt**2], [0, 0, 0, 1, self.dt], [0, 0, 0, 0, 1]])
-        self.B = np.array([[1/2*self.dt**2], [self.dt], [0], [0], [0]])
+        #self.B = np.array([[1/2*self.dt**2], [self.dt], [0], [0], [0]])
+        self.B = np.array([[0], [0], [0], [0], [0]])
         self.C = np.array([[1, 0, -1, 0, 0], [1, 0, 0, 0, 0]])
         self.D = 0
         self.f = KalmanFilter (dim_x=5, dim_z=2)
@@ -37,19 +42,41 @@ class Kalman_est():
         self.f.Q *= 3**2
         #self.f.Q = np.array([[1000, 0, 0, 0, 0],[0, 1000, 0, 0, 0], [0, 0, 1000, 0, 0], [0, 0, 0, 3000, 0], [0, 0, 0, 0, 9000]])
         self.u = 0
+        self.prev_time = time.time()
+        self.max_vel = 0
 
         
 
     def init_guess(self, drone_alt):
-        self.f.x = np.array([drone_alt, 0., 0, 0, 0])   #Initial guess of states
+        self.f.x = np.array([drone_alt, 0., 0, 1.5, 0])   #Initial guess of states
 
     def update_control_sig(self,acc):
         self.u = np.array([acc])
 
     def update_predict(self, dist, drone_alt):
-        self.f.predict(u=self.u)
+        #self.f.predict(u=self.u)
+        self.f.predict()
+        print("Predict vel: ", self.f.x[3])
         self.f.update([dist,drone_alt])
         return self.f.x
+
+    def update(self,dist,drone_alt):
+        self.f.update([dist,drone_alt])
+        print("Update vel: ", self.f.x[3])
+
+    def future_predict(self, dist, drone_alt):
+        kal = copy.deepcopy(self.f)
+        for i in range(2):
+            kal.predict()
+            #print("x[2] number {}: {}".format(i, self.f.x[2]))
+            print("Ship vel kalman: ", kal.x[3])
+        #self.f.update([dist, drone_alt])
+        return kal.x
+
+    def check_time(self):
+        #print("Time dif: ", time.time()-self.prev_time)
+        self.prev_time = time.time()
+        
 
 
         
@@ -83,8 +110,10 @@ if __name__ == '__main__':
     
 
     for z in z_vec:
-        kf.update_control_sig(0)
-        x = kf.update_predict(z, drone_al)
+        #kf.update_control_sig()
+        #x = kf.update_predict(z, drone_al)
+        x = kf.future_predict(z, drone_al)
+        dfsdg = kf.update_predict(z, drone_al)
         x_vec_4.append(x[3])
         x_vec_4_gt.append(ship_vel(t))
         t_vec.append(t)

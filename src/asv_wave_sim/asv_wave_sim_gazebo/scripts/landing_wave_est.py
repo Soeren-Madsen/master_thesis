@@ -32,8 +32,8 @@ NÆSTE GANG:
 - Tag højde for roll og pitch. Yaw justerer sig selv.
 - Måske lav trajectory generation, hvis jeg kan predict motion table. 
 - Måske lav noget der resetter link i gazebo. Skal sætte model state orientation til 0 inden link state bliver ændret, ellers ændres baseline.
-- Skal kunne følge båden mens den korriger for yaw
-- Skal stoppe med at bruge aruco når den kommer under 1 meter
+- Predict i fremtiden med predict step i kalman filter. Ligner 2-3 samples måske er max
+- Angle of ship change translation in z from aruco.
 
 '''
 
@@ -66,7 +66,7 @@ class Drone():
         self.image_ac = False
         self.allow_landing = False
         self.counter = 0
-        self.max_alt_ship = 0
+        self.max_alt_ship = -10
         if self.gazebo:
             self.landing_speed = 1.5
         else:
@@ -74,6 +74,8 @@ class Drone():
         self.yaw_fixed = False
         self.alt_flag = False
         self.last_ship_alt = 0
+        self.last_dist = 99
+        self.start_time = -1
 
         self.aru = Aruco_pose()
 
@@ -209,7 +211,10 @@ class Drone():
         else:
             targetPosition.pose.position.x = 0
             targetPosition.pose.position.y = 0
-            targetPosition.pose.position.z = self.altitude
+            if self.gazebo:
+                targetPosition.pose.position.z = self.altitude+2
+            else:
+                targetPosition.pose.position.z = self.altitude
         return targetPosition
 
     def follow_ship(self):
@@ -217,8 +222,8 @@ class Drone():
             self.model_state = rospy.ServiceProxy('/gazebo/get_model_state', GetModelState)
             model_ship = self.model_state("ship", "")
             model_drone = self.model_state("sdu_master", "")
-            print("Drone z pos: ", model_drone.pose.position.z)
-            print("ship z pos: ", model_ship.pose.position.z)
+            #print("Drone z pos: ", model_drone.pose.position.z)
+            #print("ship z pos: ", model_ship.pose.position.z)
 
         if not self.gazebo:
             self.cv_image = self.cam.get_img()
@@ -240,31 +245,43 @@ class Drone():
         else:
             targetPosition.position.x = 0 #Optitrack
         targetPosition.position.y = 0
-        if success:
-            print("yaw: ", yaw)
-            if abs(yaw) < 360: 
-                targetPosition.yaw = self.aru.euler_from_quaternion(self.current_position.pose.orientation.x, self.current_position.pose.orientation.y, self.current_position.pose.orientation.z, self.current_position.pose.orientation.w)[2]
+        if True:#success and self.last_dist > 1:
+            
+            #print("yaw: ", yaw)
+            if abs(yaw) < 5 or self.yaw_fixed: 
+                self.yaw_fixed = True
+                drone_yaw = self.aru.euler_from_quaternion(self.current_position.pose.orientation.x, self.current_position.pose.orientation.y, self.current_position.pose.orientation.z, self.current_position.pose.orientation.w)[2]
+                targ = fmod(drone_yaw - radians(yaw), 3.1415)
+                targetPosition.yaw = targ
                 if not self.gazebo and not self.alt_flag:
                     self.altitude = 2
                     self.alt_flag = True
                 #print("Distance to ship: ", dist)
-                print("Distance to ship aruco: ", dist_aruco[0])
+                self.last_dist = dist_aruco[0]
+                #print("Distance to ship aruco: ", dist_aruco[0])
                 #print("Dist dif: ", dist_aruco[0] - dist)
                 #print("Altitude of drone: ", self.current_position.pose.position.z)
                 #x = self.kf.update_predict(dist_aruco[0], self.current_position.pose.position.z)
-                x = self.kf.update_predict(dist, self.current_position.pose.position.z)
+                #x = self.kf.update_predict(dist, self.current_position.pose.position.z)
+                x = self.kf.future_predict(dist, self.current_position.pose.position.z)
+                sdf = self.kf.update_predict(dist, self.current_position.pose.position.z)
+                if self.start_time < 0:
+                    self.start_time = time.time()
+                self.kf.check_time()
                 
                 #targetPosition.pose.position.z = x[2] + self.altitude
                 targetPosition.position.z = x[2] + self.altitude
+                print("Kalman vel: ", x[3])
+                print("ship vel: ", model_ship.twist.linear.z)
 
                 st, self.z = signal.lfilter(self.b, 1, [x[3]], zi=self.z)
-                self.f_v.write(','.join([str(model_drone.pose.position.z), str(model_ship.pose.position.z), str(dist_aruco[0]), str(dist), str(x[1]), '\n']))
+                self.f_v.write(','.join([str(model_drone.pose.position.z), str(model_ship.pose.position.z), str(dist_aruco[0]), str(time.time()- self.start_time), str(x[1]), '\n']))
 
                 #targetPosition.velocity.z = x[3] #No low pass filter
                 targetPosition.velocity.z = st[0] #With low pass filter
-                self.last_ship_alt = st[0]
+                self.last_ship_alt = x[2]
 
-                self.f_x.write(','.join([str(x[0]), str(x[1]), str(x[2]), str(x[3]), '\n']))
+                self.f_x.write(','.join([str(x[0]), str(x[1]), str(x[2]), str(x[3]), str(x[4]), '\n']))
                 if self.gazebo:
                     ship_alt = model_ship.pose.position.z
                 else:
@@ -277,8 +294,8 @@ class Drone():
                 #print("ship alt: ", ship_alt)
                 
                 
-                if self.counter > 200:# and ship_alt < 0.9*self.max_alt_ship:
-                    self.allow_landing = True
+                #if self.counter > 200:# and ship_alt < 0.9*self.max_alt_ship:
+                    #self.allow_landing = True
                     
 
                 if self.allow_landing:
@@ -295,9 +312,13 @@ class Drone():
             
             if self.allow_landing:
                 self.altitude = self.altitude - self.landing_speed/self.hz
+                print("Landing no Aruco")
             else:
                 print("Unable to find aruco marker")
             targetPosition.position.z = self.last_ship_alt + self.altitude
+            drone_yaw = self.aru.euler_from_quaternion(self.current_position.pose.orientation.x, self.current_position.pose.orientation.y, self.current_position.pose.orientation.z, self.current_position.pose.orientation.w)[2]
+            targ = fmod(drone_yaw - radians(yaw), 3.1415)
+            targetPosition.yaw = targ #Måske bruge last yaw i stedet
 
         end = time.time()
         #print("Time taken: ", end-start)

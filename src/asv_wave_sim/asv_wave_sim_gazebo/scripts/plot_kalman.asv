@@ -2,11 +2,12 @@ clear; clc;
 %v_pos_dist = importdata("log_v_pos_dist.txt");
 %v_vel_dist = importdata("log_v_vel_dist.txt");
 %v_vel_dist_lp = importdata("log_v_vel_dist_lp.txt");
-v_pos_dist = importdata("log_v_pos_dist_3_wave.txt");
-v_vel_dist = importdata("log_v_vel_dist_3_wave.txt");
-v_vel_dist_lp = importdata("log_v_vel_dist_lp_3_wave.txt");
+%v_pos_dist = importdata("log_v_pos_dist_3_wave.txt");
+%v_vel_dist = importdata("log_v_vel_dist_3_wave.txt");
+%v_vel_dist_lp = importdata("log_v_vel_dist_lp_3_wave.txt");
 v_vel_aruco = importdata("log_v_vel_aruco_3_wave.txt");
-v_vel = importdata("log_v.txt");
+v_land = importdata("log_v_good_land.txt");
+%v_vel = importdata("log_v.txt");
 %x(:,1) = [];
 %v(:,1) = [];
 %x(1,:) = [];
@@ -54,19 +55,23 @@ v_vel = importdata("log_v.txt");
 % xlim([0 800])
 % legend('dist aruco', 'dist ground truth', 'dist diff')
 % 
-% figure(6)
-% plot(v_vel_aruco(:,1))
-% hold on;
-% plot(v_vel_aruco(:,2)-1.4)
-% legend('drone pos', 'ship pos')
+figure(6)
+plot(v_vel_aruco(:,1))
+hold on;
+plot(v_vel_aruco(:,2)-1.4)
+legend('drone pos', 'ship pos')
 
-figure(7)
-plot(v_vel(:,1)+5.95)
-hold on
-plot(v_vel(:,2))
+%figure(7)
+%plot(v_vel(:,1)-1)
+%hold on
+%plot(v_vel(:,2))
 
 figure(8)
-plot
+plot(v_land(:,1))
+hold on;
+plot(v_land(:,2)-6)
+legend('drone pos', 'ship pos')
+
 %%
 avg_dist_pos = mean(abs(v_pos_dist(1:800,3)-5))
 avg_dist_vel = mean(abs(v_vel_dist(1:800,3)-5))
