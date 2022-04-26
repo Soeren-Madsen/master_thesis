@@ -2,7 +2,7 @@
 <sdf version='1.6'>
 
   <model name='ship'>
-    <pose>2 0 0 0 0 0</pose>
+    <pose>2 0 0 0 0 1.6</pose>
     <static>false</static>
 
     <plugin name="hydrodynamics" filename="libHydrodynamicsPlugin.so">
@@ -25,7 +25,7 @@
 
     <link name="base_link">
       <visual name="base_visual">
-	<pose>0 0 1 -1.57079632679 0 0</pose>
+	<pose>0 0 1 0 0 0</pose>
         <geometry>
           <mesh>
             <uri>model://ship/meshes/aruco_ship_small.dae</uri>
@@ -45,14 +45,14 @@
       <!-- Mass and inertial assume volume is 0.25 densitity of water -->
       <inertial>
         <pose>0 0 0 0 0 0</pose>
-        <mass>30000</mass>
+        <mass>3000</mass>
 	<inertia>
-          <ixx>33333</ixx>
+          <ixx>3333</ixx>
           <ixy>0.0</ixy>
           <ixz>0.0</ixz>
-          <iyy>173333</iyy>
+          <iyy>1733</iyy>
           <iyz>0.0</iyz>
-          <izz>193333</izz>
+          <izz>1933</izz>
         </inertia>
       </inertial>
     </link>
@@ -107,41 +107,50 @@
           <child>imu_link</child>
         </joint>
 
-
+<static>1</static>
 <link name="world_link">
           <pose>0 0 0 0 0 0</pose>
-          <collision name="collision">
+          <visual name="visual">
             <pose>0 0 0 0 0 0</pose>
             <geometry>
               <box>
                 <size>0.01 0.01 0.01</size>
               </box>
             </geometry>
-          </collision>
-          <inertial>
-            <mass>0.006</mass>
-            <inertia>
-               <ixx>0.0001</ixx>
-               <ixy>0</ixy>
-               <ixz>0</ixz>
-               <iyy>0.0001</iyy>
-               <iyz>0</iyz>
-               <izz>0.0001</izz>
-               <!-- low intertia necessary to avoid not disturb the ship -->
-            </inertia>
-          </inertial>
+          </visual>
 </link>
 
 
 
 <!--Can make the ship only move along Z axis-->
+
+<!--joint name="world_joint" type="prismatic">
+    <child>base_link</child>
+    <parent>world</parent>
+    <axis>
+        <xyz>0 0 1</xyz>
+    </axis>
+</joint-->
+
+<!--Can make the ship move along Z axis and roll/pitch-->
 <joint name="world_joint" type="prismatic">
-            <child>base_link</child>
-            <parent>world</parent>
-            <axis>
-                <xyz>0 0 1</xyz>
-            </axis>
-        </joint>
+    <child>world_link</child>
+    <parent>world</parent>
+    <axis>
+        <xyz>0 0 1</xyz>
+    </axis>
+</joint>
+
+<joint name="world_joint2" type="universal">
+    <child>base_link</child>
+    <parent>world_link</parent>
+    <axis>
+        <xyz>1 0 0</xyz>
+    </axis>
+    <axis2>
+	<xyz>0 1 </xyz>
+    </axis2>
+</joint>
 
 
 <!-- GPS link -->

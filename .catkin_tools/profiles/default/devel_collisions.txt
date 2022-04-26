@@ -1,5 +1,5 @@
 /home/soren/master_thesis/devel/lib/libWavefieldModelPlugin.so 39
-/home/soren/master_thesis/devel/share/eit/cmake/eitConfig.cmake 94
+/home/soren/master_thesis/devel/share/eit/cmake/eitConfig.cmake 98
 /home/soren/master_thesis/devel/share/asv_wave_sim_gazebo_plugins/cmake/asv_wave_sim_gazebo_pluginsConfig-version.cmake 39
 /home/soren/master_thesis/devel/lib/eit_playground/offb_node 3
 /home/soren/master_thesis/devel/lib/asv_wave_sim_gazebo_plugins/HydrodynamicsMsgSubscriber 39
@@ -7,7 +7,7 @@
 /home/soren/master_thesis_new/devel/share/eit/cmake/eitConfig.cmake 10
 /home/soren/master_thesis/devel/lib/pkgconfig/eit_playground.pc 3
 /home/soren/master_thesis_new/devel/./cmake.lock 37
-/home/soren/master_thesis/devel/lib/pkgconfig/eit.pc 94
+/home/soren/master_thesis/devel/lib/pkgconfig/eit.pc 98
 /home/soren/master_thesis/devel/lib/libWavefieldVisualPlugin.so 39
 /home/soren/master_thesis_new/devel/lib/eit_playground/offb_node 10
 /home/soren/master_thesis/devel/share/asv_wave_sim_gazebo_plugins/cmake/asv_wave_sim_gazebo_pluginsConfig.cmake 39
@@ -15,11 +15,11 @@
 /home/soren/master_thesis_new/devel/share/eit/cmake/eitConfig-version.cmake 10
 /home/soren/master_thesis_new/devel/lib/pkgconfig/eit_playground.pc 10
 /home/soren/master_thesis_new/devel/share/eit_playground/cmake/eit_playgroundConfig-version.cmake 10
-/home/soren/master_thesis/devel/./cmake.lock 176
+/home/soren/master_thesis/devel/./cmake.lock 184
 /home/soren/master_thesis_new/devel/lib/pkgconfig/eit.pc 10
 /home/soren/master_thesis/devel/lib/eit_playground/offb_node_square 3
 /home/soren/master_thesis/devel/lib/asv_wave_sim_gazebo_plugins/WaveMsgPublisher 39
-/home/soren/master_thesis/devel/share/eit/cmake/eitConfig-version.cmake 94
+/home/soren/master_thesis/devel/share/eit/cmake/eitConfig-version.cmake 98
 /home/soren/master_thesis/devel/lib/asv_wave_sim_gazebo_plugins/GzTestRunner 39
 /home/soren/master_thesis/devel/share/eit_playground/cmake/eit_playgroundConfig.cmake 3
 /home/soren/master_thesis/devel/share/eit_playground/cmake/eit_playgroundConfig-version.cmake 3
@@ -29,6 +29,6 @@
 /home/soren/master_thesis_new/devel/share/eit_playground/cmake/eit_playgroundConfig.cmake 10
 /home/soren/master_thesis/devel/lib/asv_wave_sim_gazebo_plugins/HydrodynamicsMsgPublisher 39
 /home/soren/master_thesis/devel/lib/libHydrodynamics.so 39
-/home/soren/master_thesis/devel/lib/eit/offb_node 94
+/home/soren/master_thesis/devel/lib/eit/offb_node 98
 /home/soren/master_thesis_new/devel/lib/eit/offb_node 10
 /home/soren/master_thesis/devel/lib/asv_wave_sim_gazebo_plugins/WaveMsgSubscriber 39

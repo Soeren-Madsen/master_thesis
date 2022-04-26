@@ -11,13 +11,16 @@ import time
 
  
 class Aruco_pose():
-    def __init__(self):
+    def __init__(self, gazebo):
         # Side length of the ArUco marker in meters 
         aruco_marker_side_length =0.092  #0.097 in gazebo #0.055 real life
         aruco_marker_space = 0.01 #0.025 in gazebo #0.014 real life
 
         # Calibration parameters yaml file
-        camera_calibration_parameters_filename = 'calibration_chessboard.yaml' #Brug calibration_chessboard_real.yaml til virkelig flyvning!!!
+        if gazebo:
+            camera_calibration_parameters_filename = 'calibration_chessboard_gazebo.yaml' #Brug calibration_chessboard_real.yaml til virkelig flyvning!!!
+        else:
+            camera_calibration_parameters_filename = 'calibration_chessboard_real.yaml'
 
         cv_file = cv2.FileStorage(camera_calibration_parameters_filename, cv2.FILE_STORAGE_READ) 
         self.mtx = cv_file.getNode('K').mat()
@@ -46,6 +49,8 @@ class Aruco_pose():
         self.rvecs = None
         self.tvecs = None    
 
+        self.transform_translation_x = 0
+        self.transform_translation_y = 0
         self.transform_translation_z = 10
         self.yaw_z = 0
 
@@ -92,8 +97,8 @@ class Aruco_pose():
                 for i, marker_id in enumerate(marker_ids):
             
                     # Store the translation (i.e. position) information
-                    transform_translation_x = tvecs[0]
-                    transform_translation_y = tvecs[1]
+                    self.transform_translation_x = tvecs[0]
+                    self.transform_translation_y = tvecs[1]
                     self.transform_translation_z = tvecs[2] + 0.1 #The 0.7 is the difference of true measurement and aruco placement on the ship in gazebo
             
                     # Store the rotation information
@@ -115,8 +120,8 @@ class Aruco_pose():
                         roll_x = math.degrees(roll_x)
                         pitch_y = math.degrees(pitch_y)
                         self.yaw_z = math.degrees(self.yaw_z)
-                        #print("transform_translation_x: {}".format(transform_translation_x))
-                        #print("transform_translation_y: {}".format(transform_translation_y))
+                        print("transform_translation_x: {}".format(self.transform_translation_x))
+                        print("transform_translation_y: {}".format(self.transform_translation_y))
                         #print("transform_translation_z: {}".format(self.transform_translation_z))
                         #print("roll_x: {}".format(roll_x))
                         #print("pitch_y: {}".format(pitch_y))
@@ -138,7 +143,7 @@ class Aruco_pose():
             success = False
 
         #cv2.imshow('frame',frame)
-        return success, self.transform_translation_z, self.yaw_z #Using last value if no aruco marker is detected
+        return success, self.transform_translation_z, self.yaw_z, self.transform_translation_y, self.transform_translation_x #Using last value if no aruco marker is detected
 
  
 def main():

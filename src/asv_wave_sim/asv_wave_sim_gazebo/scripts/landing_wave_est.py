@@ -5,6 +5,7 @@ import mavros
 import cv2
 import numpy as np
 import time
+import math
 from utm import utmconv
 from std_msgs.msg import Header
 from geometry_msgs.msg import PoseStamped, TwistStamped, Twist
@@ -24,15 +25,14 @@ from gazebo_msgs.msg import ModelState, LinkState
 '''
 Denne siger hvordan PositionTarget skal sættes http://docs.ros.org/en/api/mavros_msgs/html/msg/PositionTarget.html 
 HUSK: 
+- Predict i fremtiden med predict step i kalman filter. Ligner 6 er max, 7 begynder at blive ustabil, 8 er ustabil.
 
 
 NÆSTE GANG: 
 - Lav samme log test som tidligere med den nye, for at se hvor godt den følger.
-- Få den til at flyve hen til bådens x,y baseret på aruco marker i stedet for hardcode værdien.
-- Tag højde for roll og pitch. Yaw justerer sig selv.
+- Tag højde for roll og pitch. Yaw justerer sig- selv.
 - Måske lav trajectory generation, hvis jeg kan predict motion table. 
 - Måske lav noget der resetter link i gazebo. Skal sætte model state orientation til 0 inden link state bliver ændret, ellers ændres baseline.
-- Predict i fremtiden med predict step i kalman filter. Ligner 2-3 samples måske er max
 - Angle of ship change translation in z from aruco.
 
 '''
@@ -55,7 +55,7 @@ class Drone():
         #self.home_position = NavSatFix()
         #self.current_position = NavSatFix()
         if self.gazebo:
-            self.altitude = 4.
+            self.altitude = 8. #4
         else:
             self.altitude = 3.
         self.uc = utmconv()
@@ -77,7 +77,13 @@ class Drone():
         self.last_dist = 99
         self.start_time = -1
 
-        self.aru = Aruco_pose()
+        if self.gazebo:
+            self.x_pos = -50
+        else:
+            self.x_pos = 0
+        self.y_pos = 0
+
+        self.aru = Aruco_pose(self.gazebo)
 
         self.cam = Cam()
 
@@ -204,17 +210,12 @@ class Drone():
     
     def set_target(self):
         targetPosition = PoseStamped()
+        targetPosition.pose.position.x = self.x_pos
+        targetPosition.pose.position.y = self.y_pos
         if self.gazebo:
-            targetPosition.pose.position.x = -50
-            targetPosition.pose.position.y = 0
             targetPosition.pose.position.z = self.targetGPS.altitude - self.current_position_geo.altitude + self.altitude
         else:
-            targetPosition.pose.position.x = 0
-            targetPosition.pose.position.y = 0
-            if self.gazebo:
-                targetPosition.pose.position.z = self.altitude+2
-            else:
-                targetPosition.pose.position.z = self.altitude
+            targetPosition.pose.position.z = self.altitude
         return targetPosition
 
     def follow_ship(self):
@@ -238,14 +239,17 @@ class Drone():
         #targetPosition.pose.position.y = 0.
 
         
-        success, dist_aruco, yaw = self.aru.calc_euler(self.cv_image) #Calculate distance to ship based on aruco markers
+        success, dist_aruco, yaw, y_cor, x_cor = self.aru.calc_euler(self.cv_image) #Calculate distance to ship based on aruco markers
         if self.gazebo:
-            targetPosition.position.x = -50
+            if success:
+                drone_yaw = self.aru.euler_from_quaternion(self.current_position.pose.orientation.x, self.current_position.pose.orientation.y, self.current_position.pose.orientation.z, self.current_position.pose.orientation.w)[2]
+                self.x_pos = self.x_pos - y_cor*math.cos(drone_yaw)*0.1 + x_cor*math.sin(drone_yaw)*0.1
+                self.y_pos = self.y_pos - y_cor*math.sin(drone_yaw)*0.1 + x_cor*math.cos(drone_yaw)*0.1
+                print("Yaw: ", drone_yaw)   
             dist =  model_drone.pose.position.z - model_ship.pose.position.z
-        else:
-            targetPosition.position.x = 0 #Optitrack
-        targetPosition.position.y = 0
-        if True:#success and self.last_dist > 1:
+        targetPosition.position.x = self.x_pos
+        targetPosition.position.y = self.y_pos
+        if success and self.last_dist > 1:
             
             #print("yaw: ", yaw)
             if abs(yaw) < 5 or self.yaw_fixed: 
@@ -271,8 +275,8 @@ class Drone():
                 
                 #targetPosition.pose.position.z = x[2] + self.altitude
                 targetPosition.position.z = x[2] + self.altitude
-                print("Kalman vel: ", x[3])
-                print("ship vel: ", model_ship.twist.linear.z)
+                #print("Kalman vel: ", x[3])
+                #print("ship vel: ", model_ship.twist.linear.z)
 
                 st, self.z = signal.lfilter(self.b, 1, [x[3]], zi=self.z)
                 self.f_v.write(','.join([str(model_drone.pose.position.z), str(model_ship.pose.position.z), str(dist_aruco[0]), str(time.time()- self.start_time), str(x[1]), '\n']))
@@ -294,8 +298,8 @@ class Drone():
                 #print("ship alt: ", ship_alt)
                 
                 
-                #if self.counter > 200:# and ship_alt < 0.9*self.max_alt_ship:
-                    #self.allow_landing = True
+                #if self.counter > 300:# and ship_alt < 0.9*self.max_alt_ship:
+                #    self.allow_landing = True
                     
 
                 if self.allow_landing:

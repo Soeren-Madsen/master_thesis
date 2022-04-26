@@ -56,20 +56,20 @@ class Kalman_est():
     def update_predict(self, dist, drone_alt):
         #self.f.predict(u=self.u)
         self.f.predict()
-        print("Predict vel: ", self.f.x[3])
+        #print("Predict vel: ", self.f.x[3])
         self.f.update([dist,drone_alt])
         return self.f.x
 
     def update(self,dist,drone_alt):
         self.f.update([dist,drone_alt])
-        print("Update vel: ", self.f.x[3])
+        #print("Update vel: ", self.f.x[3])
 
     def future_predict(self, dist, drone_alt):
         kal = copy.deepcopy(self.f)
-        for i in range(2):
+        for i in range(6):
             kal.predict()
             #print("x[2] number {}: {}".format(i, self.f.x[2]))
-            print("Ship vel kalman: ", kal.x[3])
+            #print("Ship vel kalman: ", kal.x[3])
         #self.f.update([dist, drone_alt])
         return kal.x
 
