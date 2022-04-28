@@ -165,20 +165,30 @@
         <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
     </joint-->
-<!--model name = 'landing'>
-<gravity>0</gravity>
-<link name='landing_gear'>
-      <pose> 0.0 0.0 -0.4 0 0 0 </pose>
+<model name = 'landing'>
+<link name='landing_gear_ref'>
+      <pose> 0.12 0.0 -0.4 0 0 0 </pose>
       <inertial>
-        <mass>0.00001</mass>
+        <mass>0.000001</mass>
         <inertia>
-          <ixx>0.00000003643274</ixx>
-          <iyy>0.00000004857971</iyy>
-          <izz>0.00000002805359</izz>
+          <ixx>0.000000001</ixx>
+          <iyy>0.000000001</iyy>
+          <izz>0.000000001</izz>
+        </inertia>
+      </inertial>
+    </link>
+<link name='landing_gear'>
+      <pose> 0.12 0.0 -0.4 0 0 0 </pose>
+      <inertial>
+        <mass>0.000001</mass>
+        <inertia>
+          <ixx>0.000000001</ixx>
+          <iyy>0.000000001</iyy>
+          <izz>0.000000001</izz>
         </inertia>
       </inertial>
       <visual name='landing_gear_visual'>
-        <pose> 0.1 0 0 0 0 0</pose>
+        <pose> 0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
             <scale>0.15 0.15 0.15</scale>
@@ -191,19 +201,25 @@
       <child>landing::landing_gear</child>
       <parent>base_link</parent>
 	<axis>
-	<xyz>1 1 0</xyz>
+	<xyz>1 0 0</xyz>
 	<use_parent_model_frame>1</use_parent_model_frame>
-	</axis>
 	<limit>
-          <lower>-1e+16</lower>
-          <upper>1e+16</upper>
-        </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>999999</spring_stiffness>
-        </dynamics>
+	<dissipation>999999999</dissipation>
+	</limit>
+	</axis>
+	<axis2>
+	<xyz>0 1 0</xyz>
+	<use_parent_model_frame>1</use_parent_model_frame>
+	<limit>
+	<dissipation>999999999</dissipation>
+	</limit>
+	</axis2>
     </joint>
-</model-->
+    <joint name='landing_gear_ref_joint' type='fixed'>
+      <child>landing::landing_gear_ref</child>
+      <parent>base_link</parent>
+    </joint>
+</model>
       
     <!-- Rotor 0 (CW) -->
     <link name='rotor_0'>
@@ -911,14 +927,14 @@
           <izz>2.407e-6</izz>
         </inertia>
       </inertial>
-      <visual name='visual'>
+      <!--visual name='visual'>
         <geometry>
           <cylinder>
             <length>0.026</length>
             <radius>0.061</radius>
           </cylinder>
         </geometry>
-      </visual>
+      </visual-->
       <sensor name="depth_camera" type="depth">
         <update_rate>30</update_rate>
         <pose>0.0 0.0 0.0 0 1.57 0</pose>

@@ -9,7 +9,7 @@ Run this command to start an ocean wave world new
 roslaunch asv_wave_sim_gazebo mavros_posix_aed.launch
 
 To enable the waves run the next line. Parameters can be changed, these are default.
-./devel/lib/asv_wave_sim_gazebo_plugins/WaveMsgPublisher   --number 3   --amplitude 0.5   --period 7   --direction 1 1   --scale 2   --angle 1   --steepness 1
+./devel/lib/asv_wave_sim_gazebo_plugins/WaveMsgPublisher   --number 3   --amplitude 0.5   --period 7   --direction 2 1   --scale 2   --angle 2   --steepness 1
 
 Steepness til 0 og angle til 0, så har jeg rene sinus waves, hvis scale er 1 er alle 3 sinus samme størrelse.
 
