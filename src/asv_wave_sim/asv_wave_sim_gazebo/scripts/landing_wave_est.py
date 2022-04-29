@@ -35,8 +35,7 @@ NÆSTE GANG:
 - Måske lav trajectory generation, hvis jeg kan predict motion table. 
 - Måske lav noget der resetter link i gazebo. Skal sætte model state orientation til 0 inden link state bliver ændret, ellers ændres baseline.
 - Angle of ship change translation in z from aruco. Test i virkeligheden hvordan programmet reagere på roll/pitch.
-- Lav lavpas filter på roll/pitch fra aruco marker
-- Find en måde at teste det virker på
+- Test roll/pitch est med båd i en vinkel.
 '''
 
 
@@ -57,7 +56,7 @@ class Drone():
         #self.home_position = NavSatFix()
         #self.current_position = NavSatFix()
         if self.gazebo:
-            self.altitude = 4. #4
+            self.altitude = 6. #4
             self.dist_to_target_thresh = 1
         else:
             self.altitude = 3.
@@ -80,7 +79,8 @@ class Drone():
         self.last_ship_alt = 0
         self.last_dist = 99
         self.start_time = -1
-        self.old_time = time.time()
+        self.old_time = -1
+        self.last_roll = -19
 
         if self.gazebo:
             self.x_pos = -50
@@ -96,6 +96,10 @@ class Drone():
         #Lowpass filter:
         self.b = signal.firwin(25, 0.02)
         self.z = signal.lfilter_zi(self.b, 1)*0 #0 er start værdi for filteret
+        self.b2 = signal.firwin(10, 0.1)
+        self.z2 = signal.lfilter_zi(self.b2, 1)*3.1415 #0 er start værdi for filteret
+        self.b3 = signal.firwin(10, 0.02)
+        self.z3 = signal.lfilter_zi(self.b3, 1)*0 #0 er start værdi for filteret
 
 
     def setup_topics(self):
@@ -199,6 +203,8 @@ class Drone():
         dist_to_takeoff_pos = 99999
         self.takeOffPosition.pose.position.z = self.altitude
         while(self.dist_to_target_thresh < dist_to_takeoff_pos):
+            if self.gazebo:
+                self.reset_link(0, 0)
             x = self.takeOffPosition.pose.position.x - self.current_position.pose.position.x
             y = self.takeOffPosition.pose.position.y - self.current_position.pose.position.y
             z = self.takeOffPosition.pose.position.z - self.current_position.pose.position.z
@@ -286,16 +292,15 @@ class Drone():
                 self.kf.check_time()
                 
                 #targetPosition.pose.position.z = x[2] + self.altitude
-                targetPosition.position.z = x[2] + self.altitude
+                targetPosition.position.z = -1#x[2] + self.altitude
                 #print("Kalman vel: ", x[3])
                 #print("ship vel: ", model_ship.twist.linear.z)
 
                 st, self.z = signal.lfilter(self.b, 1, [x[3]], zi=self.z)
-                self.f_v.write(','.join([str(model_drone.pose.position.z), str(model_ship.pose.position.z), str(dist_aruco[0]), str(time.time()- self.start_time), str(x[1]), '\n']))
-
+                
                 #targetPosition.velocity.z = x[3] #No low pass filter
-                targetPosition.velocity.z = st[0] #With low pass filter
-                self.last_ship_alt = x[2]
+                targetPosition.velocity.z = 0#st[0] #With low pass filter
+                self.last_ship_alt = -1#x[2]
 
                 self.f_x.write(','.join([str(x[0]), str(x[1]), str(x[2]), str(x[3]), str(x[4]), '\n']))
                 if self.gazebo:
@@ -308,15 +313,26 @@ class Drone():
                         self.max_alt_ship = ship_alt
                 #print("ship min alt: ", self.max_alt_ship)
                 #print("ship alt: ", ship_alt)
-                self.reset_link(roll-3.1415,pitch)
-                # new_time = time.time()
-                # if new_time - self.old_time > 5:
-                #     self.landing_gear_move(0.0,0,0)
-                #     self.reset_link()
-                #     self.old_time = new_time
-                #     print("Reset link")
-                #else:
-                    #self.landing_gear_move(roll-3.1415,pitch,0)
+                if roll < 0:
+                    roll = roll + 3.1416*2
+
+                roll_lp, self.z2 = signal.lfilter(self.b2, 1, [roll], zi=self.z2)
+                pitch_lp, self.z3 = signal.lfilter(self.b3, 1, [pitch], zi=self.z3)
+                print("Roll lp: {} pitch lp: {}".format(roll_lp,pitch_lp))
+
+                if self.old_time < 0:
+                    self.old_time = time.time()
+                new_time = time.time()
+                if new_time - self.old_time > 5:
+                    if self.gazebo:
+                        self.reset_link(roll_lp[0]-3.1415, pitch_lp[0])
+                        print("Reset link")
+                else:
+                    self.reset_link(0, 0)
+                #self.f_v.write(','.join([str(model_drone.pose.position.z), str(model_ship.pose.position.z), str(dist_aruco[0]), str(time.time()- self.start_time), str(x[1]), '\n']))
+                roll_gt, pitch_gt, yaw_gt = self.aru.euler_from_quaternion(model_ship.pose.orientation.x, model_ship.pose.orientation.y, model_ship.pose.orientation.z, model_ship.pose.orientation.w)
+                roll_drone, pitch_drone, yaw_drone = self.aru.euler_from_quaternion(model_drone.pose.orientation.x, model_drone.pose.orientation.y, model_drone.pose.orientation.z, model_drone.pose.orientation.w)
+                self.f_v.write(','.join([str(roll_gt), str(pitch_gt), str(roll), str(pitch), str(time.time()- self.start_time), str(roll_drone), str(pitch_drone), str(model_ship.pose.position.z), '\n']))
                 
                 #if self.counter > 300:# and ship_alt < 0.9*self.max_alt_ship:
                 #    self.allow_landing = True
@@ -329,6 +345,8 @@ class Drone():
                 drone_yaw = self.aru.euler_from_quaternion(self.current_position.pose.orientation.x, self.current_position.pose.orientation.y, self.current_position.pose.orientation.z, self.current_position.pose.orientation.w)[2]
                 targ = fmod(drone_yaw - radians(yaw), 3.1415)
                 targetPosition.yaw = targ
+                if self.gazebo:
+                    self.reset_link(0, 0)
                 print("target yaw: ", targ)
                 print("Drone yaw: ", drone_yaw)
             
@@ -339,7 +357,7 @@ class Drone():
                 print("Landing no Aruco")
             else:
                 print("Unable to find aruco marker")
-            targetPosition.position.z = self.last_ship_alt + self.altitude
+            targetPosition.position.z = 0#self.last_ship_alt + self.altitude
             drone_yaw = self.aru.euler_from_quaternion(self.current_position.pose.orientation.x, self.current_position.pose.orientation.y, self.current_position.pose.orientation.z, self.current_position.pose.orientation.w)[2]
             targ = fmod(drone_yaw - radians(yaw), 3.1415)
             targetPosition.yaw = targ 
@@ -415,12 +433,10 @@ class Drone():
         self.old_time = time.time()
         while (True):
             header.stamp = rospy.Time.now()
-            if self.landing_allowed:
-                     
+            if self.landing_allowed:    
                 target_pos = self.follow_ship()
                 target_pos.header = header    
                 #self.target_pos_pub.publish(target_pos)
-
                 self.target_pos_pub2.publish(target_pos)
                 
             else:
@@ -428,7 +444,8 @@ class Drone():
                 target_pos.header = header
                 self.target_pos_pub.publish(target_pos)
                 #print(self.distanceToTarget(target_pos))
-                self.reset_link(0,0)
+                if self.gazebo:
+                    self.reset_link(0,0)
                 #self.landing_gear_move(1, 0, 0)
                 if(self.distanceToTarget(target_pos) < self.dist_to_target_thresh):
                     if not self.gazebo:

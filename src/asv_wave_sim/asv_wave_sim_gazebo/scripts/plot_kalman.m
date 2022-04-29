@@ -5,9 +5,9 @@ clear; clc;
 %v_pos_dist = importdata("log_v_pos_dist_3_wave.txt");
 %v_vel_dist = importdata("log_v_vel_dist_3_wave.txt");
 %v_vel_dist_lp = importdata("log_v_vel_dist_lp_3_wave.txt");
-v_vel_aruco = importdata("log_v_vel_aruco_3_wave.txt");
-v_land = importdata("log_v_good_land.txt");
-v_vel = importdata("log_v.txt");
+%v_vel_aruco = importdata("log_v_vel_aruco_3_wave.txt");
+%v_land = importdata("log_v_good_land.txt");
+v_pitch = importdata("log_pitch.txt");
 x = importdata("log_x.txt");
 %x(:,1) = [];
 %v(:,1) = [];
@@ -33,10 +33,16 @@ x(1:10,:) = [];
 % plot(x(:,5))
 % title('acceleration ship')
 
-% figure(2)
-% plot(v(:,1))
-% hold on;
-% plot(v(:,2)-1.4)
+figure(2)
+%plot(v_vel(:,5), v_vel(:,1))
+
+%subplot(2,1,1)
+hold on;
+plot(v_pitch(:,5), v_pitch(:,2))
+%plot(v_vel(:,5), v_vel(:,3)-pi)
+plot(v_pitch(:,5), -v_pitch(:,4)- v_pitch(:,7)-0.013)
+%subplot(2,1,2)
+plot(v_pitch(:,5), v_pitch(:,8)/20)
 
 % figure(3)
 % plot(v_vel_dist(:,1))
@@ -65,10 +71,10 @@ x(1:10,:) = [];
 % plot(v_vel_aruco(:,2)-1.4)
 % legend('drone pos', 'ship pos')
 
-figure(7)
-plot(v_vel(:,4), v_vel(:,1)-1.12-(4-1.12))
-hold on
-plot(v_vel(:,4), v_vel(:,2))
+% figure(7)
+% plot(v_vel(:,4), v_vel(:,1)-1.12-(4-1.12))
+% hold on
+% plot(v_vel(:,4), v_vel(:,2))
 
 % figure(8)
 % plot(v_land(:,1))

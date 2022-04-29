@@ -105,7 +105,7 @@ class Aruco_pose():
                     # Store the translation (i.e. position) information
                     self.transform_translation_x = tvecs[0]
                     self.transform_translation_y = tvecs[1]
-                    self.transform_translation_z = tvecs[2] + 1.15 #The 0.7 is the difference of true measurement and aruco placement on the ship in gazebo
+                    self.transform_translation_z = tvecs[2] + 0.15 #The difference between the true measurement and aruco placement on the ship in gazebo
             
                     # Store the rotation information
                     rotation_matrix = np.eye(4)

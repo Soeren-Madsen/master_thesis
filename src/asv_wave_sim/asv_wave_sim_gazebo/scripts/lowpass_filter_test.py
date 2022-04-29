@@ -1,6 +1,7 @@
 from scipy import zeros, signal, random
 import matplotlib.pyplot as plt
 import numpy as np
+import csv
 
 def filter_sbs():
 
@@ -8,19 +9,28 @@ def filter_sbs():
     n = int(T * 100) # indicates total samples
     t = np.linspace(0, T, n, endpoint=False)
 
-    data = np.sin(1.2*2*np.pi*t) + 1.5*np.cos(9*2*np.pi*t) + 0.5*np.sin(12.0*2*np.pi*t)
-    #data = random.random(2000)
-    b = signal.firwin(25, 0.02)
+    #data = np.sin(1.2*2*np.pi*t) + 1.5*np.cos(9*2*np.pi*t) + 0.5*np.sin(12.0*2*np.pi*t)
+    gt = []
+    data = []
+    ship = []
+    with open('log_pitch.txt') as f:
+        csvreader = csv.reader(f)
+        for row in csvreader:
+            gt.append(float(row[1]))
+            data.append(-float(row[3])-0.015)
+            ship.append(float(row[7])/20)
+
+    data = np.array(data)
+    b = signal.firwin(15, 0.02)
     z = signal.lfilter_zi(b, 1)*0
-    print(z)
     result = zeros(data.size)
     for i, x in enumerate(data):
         result[i], z = signal.lfilter(b, 1, [x], zi=z)
-        print([x])
-    return result,data
+    return result,gt,data,ship
 
 if __name__ == '__main__':
-    result,data = filter_sbs()
+    result,gt,data, ship = filter_sbs()
     plt.plot(result)
-    plt.plot(data)
+    plt.plot(gt)
+    #plt.plot(ship)
     plt.show()

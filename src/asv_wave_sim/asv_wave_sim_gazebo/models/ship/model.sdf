@@ -34,10 +34,11 @@
         </geometry>
       </visual>
       <collision name="base_collision">
-	<pose>0 0 0 0 0 0</pose>
+	<pose>-2 0 0 0 0 0</pose>
         <geometry>
           <cylinder>
             <radius>2</radius>
+	    <length>2</length>
           </cylinder>
         </geometry>
       </collision>
