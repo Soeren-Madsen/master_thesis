@@ -11,7 +11,7 @@ v_pitch = importdata("log_pitch.txt");
 x = importdata("log_x.txt");
 %x(:,1) = [];
 %v(:,1) = [];
-x(1:10,:) = [];
+%x(1:10,:) = [];
 %v(1,:) = [];
 
 % figure(1)
@@ -42,7 +42,8 @@ plot(v_pitch(:,5), v_pitch(:,2))
 %plot(v_vel(:,5), v_vel(:,3)-pi)
 plot(v_pitch(:,5), -v_pitch(:,4)- v_pitch(:,7)-0.013)
 %subplot(2,1,2)
-plot(v_pitch(:,5), v_pitch(:,8)/20)
+%plot(v_pitch(:,5), v_pitch(:,8)/20)
+
 
 % figure(3)
 % plot(v_vel_dist(:,1))

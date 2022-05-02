@@ -33,7 +33,6 @@ NÆSTE GANG:
 - Lav samme log test som tidligere med den nye, for at se hvor godt den følger.
 - Tag højde for roll og pitch. Yaw justerer sig- selv.
 - Måske lav trajectory generation, hvis jeg kan predict motion table. 
-- Måske lav noget der resetter link i gazebo. Skal sætte model state orientation til 0 inden link state bliver ændret, ellers ændres baseline.
 - Angle of ship change translation in z from aruco. Test i virkeligheden hvordan programmet reagere på roll/pitch.
 - Test roll/pitch est med båd i en vinkel.
 '''
