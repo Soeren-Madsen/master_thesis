@@ -32,17 +32,35 @@ x = importdata("log_x.txt");
 % subplot(2,3,5)
 % plot(x(:,5))
 % title('acceleration ship')
+figure(1)
+hold on;
+plot(v_pitch(:,5), v_pitch(:,1)) %Roll gt
+plot(v_pitch(:,5), v_pitch(:,3)-pi) %Roll est
 
 figure(2)
-%plot(v_vel(:,5), v_vel(:,1))
-
-%subplot(2,1,1)
 hold on;
-plot(v_pitch(:,5), v_pitch(:,2))
-%plot(v_vel(:,5), v_vel(:,3)-pi)
-plot(v_pitch(:,5), -v_pitch(:,4)- v_pitch(:,7)-0.013)
-%subplot(2,1,2)
-%plot(v_pitch(:,5), v_pitch(:,8)/20)
+
+
+plot(v_pitch(:,5), v_pitch(:,2)) %Pitch gt
+plot(v_pitch(:,5), -v_pitch(:,4)- v_pitch(:,7)-0.013) %Pitch est
+%plot(v_pitch(:,5), v_pitch(:,8)/20) %Ship alt
+ylabel({'Angle [Radians]'});
+xlabel({'Time [s]'});
+title({'Pitch estimation with ground truth'});
+
+%FFT
+% Y = fft(v_pitch(:,4));
+% L = 752;
+% Fs = 12
+% P2 = abs(Y/L);
+% P1 = P2(1:L/2+1);
+% P1(2:end-1) = 2*P1(2:end-1);
+% figure (11)
+% f = Fs*(0:(L/2))/L;
+% plot(f,P1) 
+% title('Single-Sided Amplitude Spectrum of X(t)')
+% xlabel('f (Hz)')
+% ylabel('|P1(f)|')
 
 
 % figure(3)

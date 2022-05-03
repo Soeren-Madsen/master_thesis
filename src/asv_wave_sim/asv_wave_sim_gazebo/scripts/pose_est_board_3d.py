@@ -154,7 +154,7 @@ class Aruco_pose():
 
  
 def main():
-    aru = Aruco_pose()
+    aru = Aruco_pose(False)
     # Start the video stream
     cap = cv2.VideoCapture(0)
     

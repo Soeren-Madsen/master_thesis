@@ -35,6 +35,7 @@ NÆSTE GANG:
 - Måske lav trajectory generation, hvis jeg kan predict motion table. 
 - Angle of ship change translation in z from aruco. Test i virkeligheden hvordan programmet reagere på roll/pitch.
 - Test roll/pitch est med båd i en vinkel.
+- Prøv at tage virkelig værdier af bådens vel og acc og brug til kalman filter est som measurements.
 '''
 
 
@@ -254,8 +255,8 @@ class Drone():
         if self.gazebo:
             if success:
                 drone_yaw = self.aru.euler_from_quaternion(self.current_position.pose.orientation.x, self.current_position.pose.orientation.y, self.current_position.pose.orientation.z, self.current_position.pose.orientation.w)[2]
-                #self.x_pos = self.x_pos - y_cor*math.cos(drone_yaw)*0.01 + x_cor*math.sin(drone_yaw)*0.01
-                #self.y_pos = self.y_pos - y_cor*math.sin(drone_yaw)*0.01 + x_cor*math.cos(drone_yaw)*0.01
+                self.x_pos = self.x_pos - y_cor*math.cos(drone_yaw)*0.01 + x_cor*math.sin(drone_yaw)*0.01
+                self.y_pos = self.y_pos - y_cor*math.sin(drone_yaw)*0.01 + x_cor*math.cos(drone_yaw)*0.01
                 print("Yaw: ", drone_yaw)   
             dist =  model_drone.pose.position.z - model_ship.pose.position.z
             #targetPosition.position.x = model_ship.pose.position.x-50

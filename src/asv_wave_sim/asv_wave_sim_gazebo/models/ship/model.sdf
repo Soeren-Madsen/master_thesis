@@ -125,16 +125,16 @@
 
 <!--Can make the ship only move along Z axis-->
 
-<!--joint name="world_joint" type="prismatic">
+<joint name="world_joint" type="prismatic">
     <child>base_link</child>
     <parent>world</parent>
     <axis>
         <xyz>0 0 1</xyz>
     </axis>
-</joint-->
+</joint>
 
 <!--Can make the ship move along Z axis and roll/pitch-->
-<joint name="world_joint" type="prismatic">
+<!--joint name="world_joint" type="prismatic">
     <child>world_link</child>
     <parent>world</parent>
     <axis>
@@ -151,7 +151,7 @@
     <axis2>
 	<xyz>0 1 0</xyz>
     </axis2>
-</joint>
+</joint-->
 
 
 <!-- GPS link -->

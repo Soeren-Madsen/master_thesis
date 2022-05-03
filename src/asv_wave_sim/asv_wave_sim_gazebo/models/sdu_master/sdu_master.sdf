@@ -165,7 +165,7 @@
         <use_parent_model_frame>1</use_parent_model_frame>
         </axis>
     </joint-->
-<model name = 'landing'>
+<!--model name = 'landing'>
 <link name='landing_gear_ref'>
       <pose> 0.09 0.06 -0.4 0 0 0 </pose>
       <inertial>
@@ -219,7 +219,7 @@
       <child>landing::landing_gear_ref</child>
       <parent>base_link</parent>
     </joint>
-</model>
+</model-->
       
     <!-- Rotor 0 (CW) -->
     <link name='rotor_0'>
