@@ -96,10 +96,10 @@ class Drone():
         #Lowpass filter:
         self.b = signal.firwin(25, 0.02)
         self.z = signal.lfilter_zi(self.b, 1)*0 #0 er start værdi for filteret
-        self.b2 = signal.firwin(10, 0.1)
-        self.z2 = signal.lfilter_zi(self.b2, 1)*3.1415 #0 er start værdi for filteret
-        self.b3 = signal.firwin(10, 0.02)
-        self.z3 = signal.lfilter_zi(self.b3, 1)*0 #0 er start værdi for filteret
+        self.b2,self.a2 = signal.butter(2, 0.35, fs=10)
+        self.z2 = signal.lfilter_zi(self.b2, self.a2)*3.1415 #0 er start værdi for filteret
+        self.b3,self.a3 = signal.butter(2, 0.35, fs=10)
+        self.z3 = signal.lfilter_zi(self.b3, self.a3)*0 #0 er start værdi for filteret
 
 
     def setup_topics(self):
@@ -255,8 +255,8 @@ class Drone():
         if self.gazebo:
             if success:
                 drone_yaw = self.aru.euler_from_quaternion(self.current_position.pose.orientation.x, self.current_position.pose.orientation.y, self.current_position.pose.orientation.z, self.current_position.pose.orientation.w)[2]
-                self.x_pos = self.x_pos + y_cor*math.cos(drone_yaw)*0.003 + x_cor*math.sin(drone_yaw)*0.003
-                self.y_pos = self.y_pos - y_cor*math.sin(drone_yaw)*0.003 + x_cor*math.cos(drone_yaw)*0.003
+                #self.x_pos = self.x_pos - y_cor*math.cos(drone_yaw)*0.003 + x_cor*math.sin(drone_yaw)*0.003
+                #self.y_pos = self.y_pos - y_cor*math.sin(drone_yaw)*0.003 + x_cor*math.cos(drone_yaw)*0.003
                 print("Yaw: ", drone_yaw)   
             dist =  model_drone.pose.position.z - model_ship.pose.position.z
             #targetPosition.position.x = model_ship.pose.position.x-50
@@ -316,8 +316,8 @@ class Drone():
                 if roll < 0:
                     roll = roll + 3.1416*2
 
-                roll_lp, self.z2 = signal.lfilter(self.b2, 1, [roll], zi=self.z2)
-                pitch_lp, self.z3 = signal.lfilter(self.b3, 1, [pitch], zi=self.z3)
+                roll_lp, self.z2 = signal.lfilter(self.b2, self.a2, [roll], zi=self.z2)
+                pitch_lp, self.z3 = signal.lfilter(self.b3, self.a3, [pitch], zi=self.z3)
                 print("Roll lp: {} pitch lp: {}".format(roll_lp,pitch_lp))
 
                 if self.old_time < 0:
@@ -332,7 +332,8 @@ class Drone():
                 #self.f_v.write(','.join([str(model_drone.pose.position.z), str(model_ship.pose.position.z), str(dist_aruco[0]), str(time.time()- self.start_time), str(x[1]), '\n']))
                 roll_gt, pitch_gt, yaw_gt = self.aru.euler_from_quaternion(model_ship.pose.orientation.x, model_ship.pose.orientation.y, model_ship.pose.orientation.z, model_ship.pose.orientation.w)
                 roll_drone, pitch_drone, yaw_drone = self.aru.euler_from_quaternion(model_drone.pose.orientation.x, model_drone.pose.orientation.y, model_drone.pose.orientation.z, model_drone.pose.orientation.w)
-                self.f_v.write(','.join([str(model_ship.pose.position.z), str(dist), str(dist_aruco[0]), str(time.time()- self.start_time), '\n']))
+                self.f_v.write(','.join([str(roll_gt), str(roll_lp[0]), str(roll), str(time.time()- self.start_time), '\n']))
+                #self.f_v.write(','.join([str(dist), str(dist_aruco[0]), str(time.time()- self.start_time), '\n']))
                 
                 #if self.counter > 300:# and ship_alt < 0.9*self.max_alt_ship:
                 #    self.allow_landing = True

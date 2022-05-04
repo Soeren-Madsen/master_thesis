@@ -8,7 +8,8 @@ clear; clc;
 %v_vel_aruco = importdata("log_v_vel_aruco_3_wave.txt");
 %v_land = importdata("log_v_good_land.txt");
 % v_pitch = importdata("log_pitch.txt");
-v_dist = importdata("log_dist.txt");
+% v_dist = importdata("log_dist.txt");
+v_roll = importdata("log_roll.txt");
 x = importdata("log_x.txt");
 %x(:,1) = [];
 %v(:,1) = [];
@@ -101,10 +102,23 @@ x = importdata("log_x.txt");
 % plot(v_land(:,2)-6)
 % legend('drone pos', 'ship pos')
 
-figure(9)
-plot(v_dist(:,4), v_dist(:,2))
+% figure(9)
+% plot(v_dist(:,4), v_dist(:,2))
+% hold on;
+% plot(v_dist(:,4), v_dist(:,3))
+% ylabel({'Distance [m]'});
+% xlabel({'Time [s]'});
+% title({'Measurement of distance between ship and drone using aruco marker'});
+% 
+% avg_error = mean(abs(v_dist(:,2)-v_dist(:,3)))
+% std_error = std(v_dist(:,2)-v_dist(:,3))
+
+figure(10)
 hold on;
-plot(v_dist(:,4), v_dist(:,3))
+plot(v_roll(:,4),v_roll(:,1)-0.3)
+plot(v_roll(:,4), v_roll(:,2)-pi) %Roll est
+
+max_error = max(abs(v_roll(:,2)-pi+0.3))
 
 %%
 avg_dist_pos = mean(abs(v_pos_dist(1:800,3)-5))

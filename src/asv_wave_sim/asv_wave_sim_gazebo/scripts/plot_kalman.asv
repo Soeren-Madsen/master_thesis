@@ -7,7 +7,9 @@ clear; clc;
 %v_vel_dist_lp = importdata("log_v_vel_dist_lp_3_wave.txt");
 %v_vel_aruco = importdata("log_v_vel_aruco_3_wave.txt");
 %v_land = importdata("log_v_good_land.txt");
-v_pitch = importdata("log_pitch.txt");
+% v_pitch = importdata("log_pitch.txt");
+% v_dist = importdata("log_dist.txt");
+v_roll = importdata("log_roll.txt");
 x = importdata("log_x.txt");
 %x(:,1) = [];
 %v(:,1) = [];
@@ -32,18 +34,21 @@ x = importdata("log_x.txt");
 % subplot(2,3,5)
 % plot(x(:,5))
 % title('acceleration ship')
-
-figure(2)
-hold on;
-%plot(v_pitch(:,5), v_pitch(:,1)) %Roll gt
-%plot(v_pitch(:,5), v_pitch(:,3)-pi) %Roll est
-
-plot(v_pitch(:,5), v_pitch(:,2)) %Pitch gt
-plot(v_pitch(:,5), v_pitch(:,4)- v_pitch(:,7)-0.013) %Pitch est
-%plot(v_pitch(:,5), v_pitch(:,8)/20) %Ship alt
-ylabel({'Angle [Radians]'});
-xlabel({'Time [s]'});
-title({'Pitch estimation with ground truth'});
+% figure(1)
+% hold on;
+% plot(v_pitch(:,5), v_pitch(:,1)) %Roll gt
+% plot(v_pitch(:,5), v_pitch(:,3)-pi) %Roll est
+% 
+% figure(2)
+% hold on;
+% 
+% 
+% plot(v_pitch(:,5), v_pitch(:,2)) %Pitch gt
+% plot(v_pitch(:,5), -v_pitch(:,4)- v_pitch(:,7)-0.013) %Pitch est
+% %plot(v_pitch(:,5), v_pitch(:,8)/20) %Ship alt
+% ylabel({'Angle [Radians]'});
+% xlabel({'Time [s]'});
+% title({'Pitch estimation with ground truth'});
 
 %FFT
 % Y = fft(v_pitch(:,4));
@@ -80,7 +85,6 @@ title({'Pitch estimation with ground truth'});
 % plot(v_vel_aruco(:,4)-v_vel_aruco(:,3))
 % xlim([0 800])
 % legend('dist aruco', 'dist ground truth', 'dist diff')
-% 
 % figure(6)
 % plot(v_vel_aruco(:,1))
 % hold on;
@@ -97,6 +101,24 @@ title({'Pitch estimation with ground truth'});
 % hold on;
 % plot(v_land(:,2)-6)
 % legend('drone pos', 'ship pos')
+
+% figure(9)
+% plot(v_dist(:,4), v_dist(:,2))
+% hold on;
+% plot(v_dist(:,4), v_dist(:,3))
+% ylabel({'Distance [m]'});
+% xlabel({'Time [s]'});
+% title({'Measurement of distance between ship and drone using aruco marker'});
+% 
+% avg_error = mean(abs(v_dist(:,2)-v_dist(:,3)))
+% std_error = std(v_dist(:,2)-v_dist(:,3))
+
+figure(10)
+hold on;
+plot(v_roll(:,4),v_roll(:,1)-0.3)
+plot(v_roll(:,4), v_roll(:,2)-pi) %Roll est
+
+max_error = max(abs(v_roll))
 
 %%
 avg_dist_pos = mean(abs(v_pos_dist(1:800,3)-5))
