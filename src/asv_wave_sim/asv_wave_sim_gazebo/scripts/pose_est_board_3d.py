@@ -13,8 +13,8 @@ import time
 class Aruco_pose():
     def __init__(self, gazebo):
         # Side length of the ArUco marker in meters 
-        aruco_marker_side_length =0.092  #0.097 in gazebo #0.055 real life
-        aruco_marker_space = 0.01 #0.025 in gazebo #0.014 real life
+        #aruco_marker_side_length =0.092  #0.097 in gazebo #0.055 real life
+        #aruco_marker_space = 0.01 #0.025 in gazebo #0.014 real life
 
         # Calibration parameters yaml file
         if gazebo:
@@ -53,8 +53,8 @@ class Aruco_pose():
         #self.board = cv2.aruco.Board_create(board_corners,self.arucoDict, board_ids )
 
         #Creating a standard board, no custom
-        #self.board = cv2.aruco.GridBoard_create(3, 3, aruco_marker_side_length, aruco_marker_space, self.arucoDict) #Real life
-        self.board = cv2.aruco.GridBoard_create(2, 2, aruco_marker_side_length, aruco_marker_space, self.arucoDict) #Optitrack
+        self.board = cv2.aruco.GridBoard_create(3, 3, aruco_marker_side_length, aruco_marker_space, self.arucoDict) #Real life
+        #self.board = cv2.aruco.GridBoard_create(2, 2, aruco_marker_side_length, aruco_marker_space, self.arucoDict) #Optitrack
 
         self.rvecs = None
         self.tvecs = None    
@@ -111,7 +111,7 @@ class Aruco_pose():
                     # Store the translation (i.e. position) information
                     self.transform_translation_x = tvecs[0]
                     self.transform_translation_y = tvecs[1]
-                    self.transform_translation_z = tvecs[2] + 1.15#The difference between the true measurement and aruco placement on the ship in gazebo
+                    self.transform_translation_z = tvecs[2] #The difference between the true measurement and aruco placement on the ship in gazebo 1.15 in gazebo
             
                     # Store the rotation information
                     rotation_matrix = np.eye(4)
@@ -133,10 +133,10 @@ class Aruco_pose():
                         #self.pitch_y = math.degrees(self.pitch_y)
                         self.yaw_z = math.degrees(self.yaw_z)
                         #print("transform_translation_x: {}".format(self.transform_translation_x))
-                        #print("transform_translation_y: {}".format(self.transform_translation_y))
+                        print("transform_translation_y: {}".format(self.transform_translation_y))
                         #print("transform_translation_z: {}".format(self.transform_translation_z))
-                        print("roll_x: {}".format(self.roll_x))
-                        print("pitch_y: {}".format(self.pitch_y))
+                        #print("roll_x: {}".format(self.roll_x))
+                        #print("pitch_y: {}".format(self.pitch_y))
                         #print("yaw_z: {}".format(self.yaw_z))
                         #print("quaternion 1: {}".format(quat[0]))
                         #print("quaternion 2: {}".format(quat[1]))
@@ -168,9 +168,9 @@ def main():
     
         ret, frame = cap.read()
         aru.calc_euler(frame)
-        cv2.imshow('frame', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        #cv2.imshow('frame', frame)
+        #if cv2.waitKey(1) & 0xFF == ord('q'):
+            #break
 
     
     # Close down the video stream
