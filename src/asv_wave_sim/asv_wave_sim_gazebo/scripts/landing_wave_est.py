@@ -255,8 +255,8 @@ class Drone():
         if self.gazebo:
             if success:
                 drone_yaw = self.aru.euler_from_quaternion(self.current_position.pose.orientation.x, self.current_position.pose.orientation.y, self.current_position.pose.orientation.z, self.current_position.pose.orientation.w)[2]
-                self.x_pos = self.x_pos - y_cor*math.cos(drone_yaw)*0.01 + x_cor*math.sin(drone_yaw)*0.01
-                self.y_pos = self.y_pos - y_cor*math.sin(drone_yaw)*0.01 + x_cor*math.cos(drone_yaw)*0.01
+                self.x_pos = self.x_pos + y_cor*math.cos(drone_yaw)*0.003 + x_cor*math.sin(drone_yaw)*0.003
+                self.y_pos = self.y_pos - y_cor*math.sin(drone_yaw)*0.003 + x_cor*math.cos(drone_yaw)*0.003
                 print("Yaw: ", drone_yaw)   
             dist =  model_drone.pose.position.z - model_ship.pose.position.z
             #targetPosition.position.x = model_ship.pose.position.x-50
@@ -292,7 +292,7 @@ class Drone():
                 self.kf.check_time()
                 
                 #targetPosition.pose.position.z = x[2] + self.altitude
-                targetPosition.position.z = -1#x[2] + self.altitude
+                targetPosition.position.z = 0#x[2] + self.altitude
                 #print("Kalman vel: ", x[3])
                 #print("ship vel: ", model_ship.twist.linear.z)
 
@@ -300,14 +300,14 @@ class Drone():
                 
                 #targetPosition.velocity.z = x[3] #No low pass filter
                 targetPosition.velocity.z = 0#st[0] #With low pass filter
-                self.last_ship_alt = -1#x[2]
+                self.last_ship_alt = 0#x[2]
 
                 self.f_x.write(','.join([str(x[0]), str(x[1]), str(x[2]), str(x[3]), str(x[4]), '\n']))
                 if self.gazebo:
                     ship_alt = model_ship.pose.position.z
                 else:
                     ship_alt = 0 #ÆNDRER TIL ALT AF PLATFORM!!!!!!!!!!!!!!
-                if dist_aruco < self.altitude + 0.2:
+                if dist_aruco[0] < self.altitude + 0.2:
                     self.counter = self.counter + 1
                     if ship_alt<self.max_alt_ship:
                         self.max_alt_ship = ship_alt
@@ -332,7 +332,7 @@ class Drone():
                 #self.f_v.write(','.join([str(model_drone.pose.position.z), str(model_ship.pose.position.z), str(dist_aruco[0]), str(time.time()- self.start_time), str(x[1]), '\n']))
                 roll_gt, pitch_gt, yaw_gt = self.aru.euler_from_quaternion(model_ship.pose.orientation.x, model_ship.pose.orientation.y, model_ship.pose.orientation.z, model_ship.pose.orientation.w)
                 roll_drone, pitch_drone, yaw_drone = self.aru.euler_from_quaternion(model_drone.pose.orientation.x, model_drone.pose.orientation.y, model_drone.pose.orientation.z, model_drone.pose.orientation.w)
-                self.f_v.write(','.join([str(roll_gt), str(pitch_gt), str(roll), str(pitch), str(time.time()- self.start_time), str(roll_drone), str(pitch_drone), str(model_ship.pose.position.z), '\n']))
+                self.f_v.write(','.join([str(model_ship.pose.position.z), str(dist), str(dist_aruco[0]), str(time.time()- self.start_time), '\n']))
                 
                 #if self.counter > 300:# and ship_alt < 0.9*self.max_alt_ship:
                 #    self.allow_landing = True

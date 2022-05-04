@@ -18,9 +18,15 @@ class Aruco_pose():
 
         # Calibration parameters yaml file
         if gazebo:
-            camera_calibration_parameters_filename = 'calibration_chessboard_gazebo.yaml' #Brug calibration_chessboard_real.yaml til virkelig flyvning!!!
-            aruco_marker_side_length =0.66#0.097#0.66
-            aruco_marker_space = 0.066#0.025#0.066
+            #Works for distance
+            camera_calibration_parameters_filename = 'calibration_chessboard.yaml'
+            aruco_marker_side_length =0.097#0.097#0.66
+            aruco_marker_space = 0.025#0.025#0.066
+
+            #Works for x,y correction
+            # camera_calibration_parameters_filename = 'calibration_chessboard_gazebo.yaml'
+            # aruco_marker_side_length =0.66
+            # aruco_marker_space = 0.066
         else:
             camera_calibration_parameters_filename = 'calibration_chessboard_real.yaml'
             aruco_marker_side_length =0.055
@@ -105,7 +111,7 @@ class Aruco_pose():
                     # Store the translation (i.e. position) information
                     self.transform_translation_x = tvecs[0]
                     self.transform_translation_y = tvecs[1]
-                    self.transform_translation_z = tvecs[2] + 0.15 #The difference between the true measurement and aruco placement on the ship in gazebo
+                    self.transform_translation_z = tvecs[2] + 1.15#The difference between the true measurement and aruco placement on the ship in gazebo
             
                     # Store the rotation information
                     rotation_matrix = np.eye(4)
