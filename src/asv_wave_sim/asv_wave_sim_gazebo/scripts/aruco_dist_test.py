@@ -5,7 +5,6 @@ import mavros
 import cv2
 import numpy as np
 import time
-import math
 from utm import utmconv
 from std_msgs.msg import Header
 from geometry_msgs.msg import PoseStamped, TwistStamped, Twist
@@ -14,9 +13,7 @@ from mavros_msgs.msg import State, PositionTarget
 from mavros_msgs.srv import CommandBool, SetMode, CommandTOL
 from math import sqrt, degrees, radians, fmod
 from sensor_msgs.msg import NavSatFix, Imu, Image
-from kalman_ship import Kalman_est
 from pose_est_board_3d import Aruco_pose
-from scipy import signal
 from ros_cam import Cam
 
 class Drone():
@@ -43,8 +40,6 @@ class Drone():
             self.dist_to_target_thresh = 2
         self.uc = utmconv()
         self.setup_topics()
-        self.kf = Kalman_est()
-        self.kf.init_guess(self.altitude)
         self.landing_allowed = False
         self.image_ac = False
         self.allow_landing = False
@@ -73,13 +68,6 @@ class Drone():
 
         self.cam = Cam()
 
-        #Lowpass filter:
-        self.b = signal.firwin(25, 0.02)
-        self.z = signal.lfilter_zi(self.b, 1)*0 #0 er start værdi for filteret
-        self.b2 = signal.firwin(10, 0.1)
-        self.z2 = signal.lfilter_zi(self.b2, 1)*3.1415 #0 er start værdi for filteret
-        self.b3 = signal.firwin(10, 0.02)
-        self.z3 = signal.lfilter_zi(self.b3, 1)*0 #0 er start værdi for filteret
 
 
     def setup_topics(self):
@@ -99,7 +87,6 @@ class Drone():
         self.state_sub = rospy.Subscriber('/mavros/state', State, self.state_cb)
         self.pos_sub = rospy.Subscriber("/mavros/global_position/raw/fix", NavSatFix, self.gps_pos_cb)
         self.pos_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.position_cb)
-        self.target_pos_sub = rospy.Subscriber("/fix", NavSatFix, self.target_cb)
         self.imu_sub = rospy.Subscriber('/mavros/imu/data', Imu, self.imu_cb)
 
         ## Publishers:
