@@ -32,7 +32,7 @@ class Drone():
         self.current_imu = Imu()
         self.receivedPosition = False
         if self.gazebo:
-            self.altitude = 6. #4
+            self.altitude = 2. #4
             self.dist_to_target_thresh = 1
         else:
             self.altitude = 2.
@@ -43,7 +43,7 @@ class Drone():
         self.start_time = -1
 
         if self.gazebo:
-            self.x_pos = -50
+            self.x_pos = 0
         else:
             self.x_pos = 0
         self.y_pos = 0
@@ -131,17 +131,18 @@ class Drone():
 
 
         print("Waiting for change mode to offboard")
-        if self.gazebo:
-            print("Enabling OFFBOARD")
-            while not self.state.mode == "OFFBOARD":
-                self.rate.sleep()
-                self.target_pos_pub.publish(self.takeOffPosition)
-                self.set_mode_client(base_mode=0, custom_mode="OFFBOARD")
-                print("OFFBOARD enable")
+        #if self.gazebo:
+            #print("Enabling OFFBOARD")
+        while not self.state.mode == "OFFBOARD":
+            self.rate.sleep()
+            self.target_pos_pub.publish(self.takeOffPosition)
+                #self.set_mode_client(base_mode=0, custom_mode="OFFBOARD")
+                #print("OFFBOARD enable")
 
         print("Rotorcraft arming")
         while not self.state.armed:
             self.target_pos_pub.publish(self.takeOffPosition)
+            self.rate.sleep()
             if not self.state.armed:
                 self.arming_client(True)
 
@@ -161,8 +162,8 @@ class Drone():
         self.takeOffPosition.pose.position.x = 0
         self.takeOffPosition.pose.position.y = 0
         self.takeOffPosition.pose.position.z = self.altitude
-        
-        while(self.dist_to_target_thresh < dist_to_takeoff_pos):
+        self.counter=0        
+        while self.counter < 300 or self.dist_to_target_thresh < dist_to_takeoff_pos:
             if self.start_time < 0:
                 self.start_time = time.time()
             dist_to_takeoff_pos = self.distanceToTarget(self.takeOffPosition)
@@ -172,13 +173,14 @@ class Drone():
             self.cv_image = self.cam.get_img()
             success, dist_aruco, yaw, y_cor, x_cor, roll, pitch = self.aru.calc_euler(self.cv_image)
             self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), '\n']))
-            print("Distance to target: ", dist_to_takeoff_pos)
+            print("Distance to target1: ", dist_to_takeoff_pos)
+            self.counter = self.counter + 1
             self.rate.sleep()
 
         dist_to_takeoff_pos = 99999
         self.takeOffPosition.pose.position.z = self.altitude-1
         self.counter = 0
-        while self.counter < 300 and self.dist_to_target_thresh < dist_to_takeoff_pos:
+        while self.counter < 300 or self.dist_to_target_thresh < dist_to_takeoff_pos:
             header.stamp = rospy.Time.now()
             self.takeOffPosition.header = header
             self.target_pos_pub.publish(self.takeOffPosition)
@@ -186,13 +188,14 @@ class Drone():
             self.cv_image = self.cam.get_img()
             success, dist_aruco, yaw, y_cor, x_cor, roll, pitch = self.aru.calc_euler(self.cv_image)
             self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), '\n']))
-            print("Distance to target: ", dist_to_takeoff_pos)
+            print("Distance to target2: ", dist_to_takeoff_pos)
             self.counter = self.counter + 1
+            self.rate.sleep()
 
         dist_to_takeoff_pos = 99999
         self.counter = 0
         self.takeOffPosition.pose.position.z = self.altitude
-        while self.counter < 300 and self.dist_to_target_thresh < dist_to_takeoff_pos:
+        while self.counter < 300 or self.dist_to_target_thresh < dist_to_takeoff_pos:
             header.stamp = rospy.Time.now()
             self.takeOffPosition.header = header
             self.target_pos_pub.publish(self.takeOffPosition)
@@ -200,8 +203,9 @@ class Drone():
             self.cv_image = self.cam.get_img()
             success, dist_aruco, yaw, y_cor, x_cor, roll, pitch = self.aru.calc_euler(self.cv_image)
             self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), '\n']))
-            print("Distance to target: ", dist_to_takeoff_pos)
+            print("Distance to target3: ", dist_to_takeoff_pos)
             self.counter = self.counter + 1
+            self.rate.sleep()
 
     def shutdownDrone(self):
         while not self.state.mode == "AUTO.LAND":
@@ -231,6 +235,6 @@ if __name__ == '__main__':
     print(arg)
     drone = Drone(arg)
     drone.setup()
-    drone.fly_to_ship()
+    #drone.fly_to_ship()
     drone.shutdownDrone()
     rospy.spin()
