@@ -172,6 +172,10 @@ class Drone():
             self.target_pos_pub.publish(self.takeOffPosition)
             self.cv_image = self.cam.get_img()
             success, dist_aruco, yaw, y_cor, x_cor, roll, pitch = self.aru.calc_euler(self.cv_image)
+            if success:
+                print("Aruco marker found")
+            else:
+                print("not found")
             self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), '\n']))
             print("Distance to target1: ", dist_to_takeoff_pos)
             self.counter = self.counter + 1
