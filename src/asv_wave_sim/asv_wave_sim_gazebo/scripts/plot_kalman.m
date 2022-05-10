@@ -9,12 +9,14 @@ clear; clc;
 %v_land = importdata("log_v_good_land.txt");
 % v_pitch = importdata("log_pitch.txt");
 % v_dist = importdata("log_dist.txt");
-v_roll = importdata("log_roll.txt");
+% v_roll = importdata("log_roll.txt");
+dist_test = importdata("dist_test_no_movement.txt");
 x = importdata("log_x.txt");
 %x(:,1) = [];
 %v(:,1) = [];
 %x(1:10,:) = [];
 %v(1,:) = [];
+dist_test(1:50,:)=[]
 
 % figure(1)
 % subplot(2,3,1)
@@ -113,13 +115,17 @@ x = importdata("log_x.txt");
 % avg_error = mean(abs(v_dist(:,2)-v_dist(:,3)))
 % std_error = std(v_dist(:,2)-v_dist(:,3))
 
-figure(10)
+% figure(10)
+% hold on;
+% plot(v_roll(:,4),v_roll(:,1)-0.3)
+% plot(v_roll(:,4), v_roll(:,2)-pi) %Roll est
+% 
+% max_error = max(abs(v_roll(:,2)-pi+0.3))
+
+figure(11)
 hold on;
-plot(v_roll(:,4),v_roll(:,1)-0.3)
-plot(v_roll(:,4), v_roll(:,2)-pi) %Roll est
-
-max_error = max(abs(v_roll(:,2)-pi+0.3))
-
+plot(dist_test(:,3), dist_test(:,1)+0.17)
+plot(dist_test(:,3), dist_test(:,2))
 %%
 avg_dist_pos = mean(abs(v_pos_dist(1:800,3)-5))
 avg_dist_vel = mean(abs(v_vel_dist(1:800,3)-5))
