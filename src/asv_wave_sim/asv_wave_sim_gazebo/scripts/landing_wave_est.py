@@ -20,7 +20,6 @@ from scipy import signal
 from ros_cam import Cam
 from gazebo_msgs.srv import GetModelState, SetModelState, SetLinkState
 from gazebo_msgs.msg import ModelState, LinkState
-from inputimeout import inputimeout, TimeoutOccurred
 
 
 '''

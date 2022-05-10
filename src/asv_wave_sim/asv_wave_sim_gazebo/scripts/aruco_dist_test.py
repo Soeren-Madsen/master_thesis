@@ -5,6 +5,7 @@ import mavros
 import cv2
 import numpy as np
 import time
+import sys
 from utm import utmconv
 from std_msgs.msg import Header
 from geometry_msgs.msg import PoseStamped, TwistStamped, Twist
@@ -17,8 +18,8 @@ from pose_est_board_3d import Aruco_pose
 from ros_cam import Cam
 
 class Drone():
-    def __init__(self):
-        self.gazebo = True
+    def __init__(self, arg = False):
+        self.gazebo = arg
 
         self.f_x = open("log_x.txt", 'a')
         self.f_v = open("log_v.txt", 'a')
@@ -30,39 +31,22 @@ class Drone():
         self.current_position_geo = GeoPoseStamped()
         self.current_imu = Imu()
         self.receivedPosition = False
-        #self.home_position = NavSatFix()
-        #self.current_position = NavSatFix()
         if self.gazebo:
             self.altitude = 6. #4
             self.dist_to_target_thresh = 1
         else:
-            self.altitude = 3.
-            self.dist_to_target_thresh = 2
+            self.altitude = 2.
+            self.dist_to_target_thresh = 1
         self.uc = utmconv()
         self.setup_topics()
-        self.landing_allowed = False
-        self.image_ac = False
-        self.allow_landing = False
         self.counter = 0
-        self.max_alt_ship = -10
-        if self.gazebo:
-            self.landing_speed = 1.5
-        else:
-            self.landing_speed = 1
-        self.yaw_fixed = False
-        self.alt_flag = False
-        self.last_ship_alt = 0
-        self.last_dist = 99
         self.start_time = -1
-        self.old_time = -1
-        self.last_roll = -19
 
         if self.gazebo:
             self.x_pos = -50
         else:
             self.x_pos = 0
         self.y_pos = 0
-        self.key_press = 0
 
         self.aru = Aruco_pose(self.gazebo)
 
@@ -152,9 +136,8 @@ class Drone():
             while not self.state.mode == "OFFBOARD":
                 self.rate.sleep()
                 self.target_pos_pub.publish(self.takeOffPosition)
-                if not self.state.mode == "OFFBOARD":
-                    self.set_mode_client(base_mode=0, custom_mode="OFFBOARD")
-                    print("OFFBOARD enable")
+                self.set_mode_client(base_mode=0, custom_mode="OFFBOARD")
+                print("OFFBOARD enable")
 
         print("Rotorcraft arming")
         while not self.state.armed:
@@ -170,6 +153,8 @@ class Drone():
             header.stamp = rospy.Time.now()
             self.takeOffPosition.header = header
             self.target_pos_pub.publish(self.takeOffPosition)
+            print("Distance to takeoff: ", dist_to_takeoff_pos)
+            print("Drone z: ", self.current_position.pose.position.z)
             self.rate.sleep()
         
         dist_to_takeoff_pos = 99999
@@ -187,23 +172,35 @@ class Drone():
             self.cv_image = self.cam.get_img()
             success, dist_aruco, yaw, y_cor, x_cor, roll, pitch = self.aru.calc_euler(self.cv_image)
             self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), '\n']))
+            print("Distance to target: ", dist_to_takeoff_pos)
             self.rate.sleep()
 
         dist_to_takeoff_pos = 99999
         self.takeOffPosition.pose.position.z = self.altitude-1
+        self.counter = 0
         while self.counter < 300 and self.dist_to_target_thresh < dist_to_takeoff_pos:
+            header.stamp = rospy.Time.now()
+            self.takeOffPosition.header = header
+            self.target_pos_pub.publish(self.takeOffPosition)
+            dist_to_takeoff_pos = self.distanceToTarget(self.takeOffPosition)
             self.cv_image = self.cam.get_img()
             success, dist_aruco, yaw, y_cor, x_cor, roll, pitch = self.aru.calc_euler(self.cv_image)
             self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), '\n']))
+            print("Distance to target: ", dist_to_takeoff_pos)
             self.counter = self.counter + 1
 
         dist_to_takeoff_pos = 99999
         self.counter = 0
         self.takeOffPosition.pose.position.z = self.altitude
         while self.counter < 300 and self.dist_to_target_thresh < dist_to_takeoff_pos:
+            header.stamp = rospy.Time.now()
+            self.takeOffPosition.header = header
+            self.target_pos_pub.publish(self.takeOffPosition)
+            dist_to_takeoff_pos = self.distanceToTarget(self.takeOffPosition)
             self.cv_image = self.cam.get_img()
             success, dist_aruco, yaw, y_cor, x_cor, roll, pitch = self.aru.calc_euler(self.cv_image)
             self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), '\n']))
+            print("Distance to target: ", dist_to_takeoff_pos)
             self.counter = self.counter + 1
 
     def shutdownDrone(self):
@@ -220,7 +217,19 @@ class Drone():
 
 if __name__ == '__main__':
     rospy.init_node('drone_control', anonymous=True)
-    drone = Drone()
+    try:
+        arg = sys.argv[1]
+        if arg == "Gazebo":
+            arg = True
+            print("Running Gazebo!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        else:
+            arg = False
+    except:
+        print("Running optitrack")
+        arg = False
+    
+    print(arg)
+    drone = Drone(arg)
     drone.setup()
     drone.fly_to_ship()
     drone.shutdownDrone()

@@ -46,7 +46,7 @@ while t < 4.51
     zd_t = zd(t,freq,A) + zd(t,freq2,A2) + zd(t,freq3,A3);
     zd_d_tf = zd_dot(tf,freq,A) + zd_dot(tf,freq2,A2) + zd_dot(tf,freq3,A3);
     
-    za_tau = za + za_dot*(tf-t)+1/2*zrmax_ddot*(tf-t)^2-zd_tf+zd_t+zd_d_t*(tf-t);
+    za_t    au = za + za_dot*(tf-t)+1/2*zrmax_ddot*(tf-t)^2-zd_tf+zd_t+zd_d_t*(tf-t);
     za_dot_tau = za_dot+ zrmax_ddot*(tf-t)-zd_d_tf+zd_d_t;
     
     zd_dd = zd_ddot(t,freq,A) + zd_ddot(t,freq2,A2) + zd_ddot(t,freq3,A3);

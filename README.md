@@ -58,6 +58,7 @@ Hector plugins til gazebo skal installeres før GPS til båden + drone virker
 OPTITRACK
 Skal køre commandoen:
 source /opt/ros/noetic/setup.bash
+source devel/setup.bash i master thesis!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 før start
 MAV_1_CONFIG skal ændres til telem2!!!!!!!!!!!!!!!
 
