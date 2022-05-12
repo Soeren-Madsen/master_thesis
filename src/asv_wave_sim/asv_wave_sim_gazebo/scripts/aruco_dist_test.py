@@ -188,6 +188,23 @@ class Drone():
             self.rate.sleep()
             #if not self.state.mode == "OFFBOARD":
                 #break
+        self.counter = 0
+        while self.counter < 300 or self.dist_to_target_thresh < dist_to_takeoff_pos:
+            if self.start_time < 0:
+                self.start_time = time.time()
+            dist_to_takeoff_pos = self.distanceToTarget(self.takeOffPosition)
+            header.stamp = rospy.Time.now()
+            self.takeOffPosition.header = header
+            self.target_pos_pub.publish(self.takeOffPosition)
+            self.cv_image = self.cam.get_img()
+            success, dist_aruco, yaw, y_cor, x_cor, roll, pitch = self.aru.calc_euler(self.cv_image)
+            drone_yaw = self.aru.euler_from_quaternion(self.current_position.pose.orientation.x, self.current_position.pose.orientation.y, self.current_position.pose.orientation.z, self.current_position.pose.orientation.w)[2]
+            targ = fmod(drone_yaw - radians(yaw), 3.1415)
+            targetPosition.yaw = targ
+            #self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), '\n']))
+            print("Distance to target1: ", dist_to_takeoff_pos)
+            self.counter = self.counter + 1
+            self.rate.sleep()
         
         dist_to_takeoff_pos = 99999
         #self.takeOffPosition.pose.position.z = self.altitude-1
@@ -197,6 +214,7 @@ class Drone():
         while self.counter < 1500 or self.dist_to_target_thresh < dist_to_takeoff_pos:
             self.cv_image = self.cam.get_img()
             success, dist_aruco, yaw, y_cor, x_cor, roll, pitch = self.aru.calc_euler(self.cv_image)
+            drone_yaw = self.aru.euler_from_quaternion(self.current_position.pose.orientation.x, self.current_position.pose.orientation.y, self.current_position.pose.orientation.z, self.current_position.pose.orientation.w)[2]
             pos_x = pos_x - y_cor*math.cos(drone_yaw)*0.003 + x_cor*math.sin(drone_yaw)*0.003
             pos_y = pos_y - y_cor*math.sin(drone_yaw)*0.003 + x_cor*math.cos(drone_yaw)*0.003
             self.takeOffPosition.pose.position.x = pos_x
