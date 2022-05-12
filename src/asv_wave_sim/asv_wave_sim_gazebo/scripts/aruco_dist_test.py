@@ -175,7 +175,7 @@ class Drone():
         #self.takeOffPosition.pose.position.z = self.motion_table.pose.position.z +1
         #print("Motion table x: {} y: {} z: {}".format(self.motion_table.pose.position.x, self.motion_table.pose.position.y, self.motion_table.pose.position.z))
         self.counter=0        
-        while self.counter < 3000 or self.dist_to_target_thresh < dist_to_takeoff_pos:
+        while self.counter < 300 or self.dist_to_target_thresh < dist_to_takeoff_pos:
             if self.start_time < 0:
                 self.start_time = time.time()
             dist_to_takeoff_pos = self.distanceToTarget(self.takeOffPosition)
@@ -211,7 +211,7 @@ class Drone():
             self.target_pos_pub.publish(self.takeOffPosition)
             dist_to_takeoff_pos = self.distanceToTarget(self.takeOffPosition)
             #self.f_v.write(','.join([str(x_cor),str(y_cor), str(time.time()- self.start_time), str(pos_x), str(pos_y), '\n']))
-            self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), '\n']))
+            self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), str(self.motion_table.pose.position.z), '\n']))
             print("Distance to target2: ", dist_to_takeoff_pos)
             #self.counter = self.counter + 1
             self.rate.sleep()
