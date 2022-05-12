@@ -3,6 +3,7 @@ import cv2
 class Cam():
     def __init__(self):
         self.cap = cv2.VideoCapture(0)
+        self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
     def get_img(self):
         ret, frame = self.cap.read()

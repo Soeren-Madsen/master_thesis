@@ -11,7 +11,8 @@ clear; clc;
 % v_dist = importdata("log_dist.txt");
 % v_roll = importdata("log_roll.txt");
 % dist_test = importdata("dist_test_no_movement.txt");
-xy_cor = importdata("xy_cor_pic.txt");
+% xy_cor = importdata("xy_cor_pic.txt");
+dist_motion = importdata("dist_motion_delay.txt")
 x = importdata("log_x.txt");
 %x(:,1) = [];
 %v(:,1) = [];
@@ -127,13 +128,18 @@ x = importdata("log_x.txt");
 % hold on;
 % plot(dist_test(:,3), dist_test(:,1)+0.17) %Distance aruco marker
 % plot(dist_test(:,3), dist_test(:,2)) %Drones own position
+% 
+% figure (12)
+% hold on;
+% plot(xy_cor(:,3)-xy_cor(1,3), xy_cor(:,1)) %X_cor from aruco
+% plot(xy_cor(:,3)-xy_cor(1,3), xy_cor(:,2)) %y_cor from aruco
+% plot(xy_cor(:,3)-xy_cor(1,3), xy_cor(:,4)) %x_pos drone
+% plot(xy_cor(:,3)-xy_cor(1,3), xy_cor(:,5)) %y_pos drone
 
-figure (12)
+figure(13)
 hold on;
-plot(xy_cor(:,3)-xy_cor(1,3), xy_cor(:,1)) %X_cor from aruco
-plot(xy_cor(:,3)-xy_cor(1,3), xy_cor(:,2)) %y_cor from aruco
-plot(xy_cor(:,3)-xy_cor(1,3), xy_cor(:,4)) %x_pos drone
-plot(xy_cor(:,3)-xy_cor(1,3), xy_cor(:,5)) %y_pos drone
+plot(dist_motion(:,3)-dist_motion(1,3), dist_motion(:,1)+0.21) %Distance aruco marker
+plot(dist_motion(:,3)-dist_motion(1,3), dist_motion(:,2)-dist_motion(:,4)) %Ground truth
 %%
 avg_dist_pos = mean(abs(v_pos_dist(1:800,3)-5))
 avg_dist_vel = mean(abs(v_vel_dist(1:800,3)-5))

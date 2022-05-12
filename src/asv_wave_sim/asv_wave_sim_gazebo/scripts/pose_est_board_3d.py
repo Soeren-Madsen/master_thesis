@@ -30,7 +30,7 @@ class Aruco_pose():
             aruco_marker_side_length = 0.455#0.66
             aruco_marker_space = 0.09#0.066
 
-            self.board = cv2.aruco.GridBoard_create(2, 2, aruco_marker_side_length, aruco_marker_space, self.arucoDict) #Optitrack
+            self.board = cv2.aruco.GridBoard_create(2, 2, aruco_marker_side_length, aruco_marker_space, self.arucoDict) #Gazebo
         else:
             camera_calibration_parameters_filename = 'calibration_chessboard_real.yaml'
             aruco_marker_side_length =0.055
@@ -169,6 +169,7 @@ def main():
     aru = Aruco_pose(False)
     # Start the video stream
     cap = cv2.VideoCapture(0)
+    cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
     
     while(True):
     
