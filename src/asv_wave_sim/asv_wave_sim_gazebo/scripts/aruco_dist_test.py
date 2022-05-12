@@ -202,6 +202,7 @@ class Drone():
             self.cv_image = self.cam.get_img()
             success, dist_aruco, yaw, y_cor, x_cor, roll, pitch = self.aru.calc_euler(self.cv_image)
             #drone_yaw = self.aru.euler_from_quaternion(self.current_position.pose.orientation.x, self.current_position.pose.orientation.y, self.current_position.pose.orientation.z, self.current_position.pose.orientation.w)[2]
+            ori = self.aru.euler_from_quaternion(self.motion_table.pose.orientation.x, self.motion_table.pose.orientation.y, self.motion_table.pose.orientation.z, self.motion_table.pose.orientation.w)
             #pos_x = pos_x + y_cor*math.cos(0)*0.01 + x_cor*math.sin(0)*0.01
             #pos_y = pos_y - y_cor*math.sin(0)*0.01 + x_cor*math.cos(0)*0.01
             #self.takeOffPosition.pose.position.x = pos_x
@@ -211,7 +212,8 @@ class Drone():
             self.target_pos_pub.publish(self.takeOffPosition)
             dist_to_takeoff_pos = self.distanceToTarget(self.takeOffPosition)
             #self.f_v.write(','.join([str(x_cor),str(y_cor), str(time.time()- self.start_time), str(pos_x), str(pos_y), '\n']))
-            self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), str(self.motion_table.pose.position.z), '\n']))
+            #self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), str(self.motion_table.pose.position.z), '\n']))
+            self.f_v.write(','.join([str(roll),str(pitch), str(time.time()- self.start_time), str(ori[0]), str(ori[1]), '\n']))
             print("Distance to target2: ", dist_to_takeoff_pos)
             #self.counter = self.counter + 1
             self.rate.sleep()
