@@ -112,6 +112,11 @@ class Drone():
 
 
     def setup(self):
+
+        targetPosition = PositionTarget()
+        targetPosition.coordinate_frame = 1
+        #targetPosition = PoseStamped()
+        targetPosition.type_mask = 3064 #Ignore everything but PX, PY, PZ, VZ #4088. 3064 er med Yaw
         print("Waiting for FCU connection...")
         while not self.state.connected:
             self.rate.sleep()
@@ -189,18 +194,17 @@ class Drone():
             #if not self.state.mode == "OFFBOARD":
                 #break
         self.counter = 0
-        while self.counter < 300 or self.dist_to_target_thresh < dist_to_takeoff_pos:
+        while self.counter < 300: #Correcting yaw
             if self.start_time < 0:
                 self.start_time = time.time()
-            dist_to_takeoff_pos = self.distanceToTarget(self.takeOffPosition)
             header.stamp = rospy.Time.now()
-            self.takeOffPosition.header = header
-            self.target_pos_pub.publish(self.takeOffPosition)
+            targetPosition.header = header
             self.cv_image = self.cam.get_img()
             success, dist_aruco, yaw, y_cor, x_cor, roll, pitch = self.aru.calc_euler(self.cv_image)
             drone_yaw = self.aru.euler_from_quaternion(self.current_position.pose.orientation.x, self.current_position.pose.orientation.y, self.current_position.pose.orientation.z, self.current_position.pose.orientation.w)[2]
             targ = fmod(drone_yaw - radians(yaw), 3.1415)
             targetPosition.yaw = targ
+            self.target_pos_pub2.publish(targetPosition)
             #self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), '\n']))
             print("Distance to target1: ", dist_to_takeoff_pos)
             self.counter = self.counter + 1
