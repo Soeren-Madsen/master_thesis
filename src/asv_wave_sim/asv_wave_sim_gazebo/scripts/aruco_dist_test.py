@@ -72,7 +72,7 @@ class Drone():
         self.pos_sub = rospy.Subscriber("/mavros/global_position/raw/fix", NavSatFix, self.gps_pos_cb)
         self.pos_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.position_cb)
         self.imu_sub = rospy.Subscriber('/mavros/imu/data', Imu, self.imu_cb)
-        self.motion_table_sub = rospy.Subscriber("/vrpn_client_node/thesis/pose", PoseStamped, self.motion_table_cb)
+        #self.motion_table_sub = rospy.Subscriber("/vrpn_client_node/thesis/pose", PoseStamped, self.motion_table_cb)
 
         ## Publishers:
         self.target_pos_pub = rospy.Publisher("/mavros/setpoint_position/local", PoseStamped, queue_size=1)
@@ -153,7 +153,7 @@ class Drone():
         header = Header()
         dist_to_takeoff_pos = 99999
         self.takeOffPosition.pose.position.z = self.altitude
-        print("Motion table alt: ", self.motion_table.pose.position.z)
+        #print("Motion table alt: ", self.motion_table.pose.position.z)
         #self.takeOffPosition.pose.position.z = self.motion_table.pose.position.z + 1
         while(self.dist_to_target_thresh < dist_to_takeoff_pos):
             dist_to_takeoff_pos = self.distanceToTarget(self.takeOffPosition)
@@ -171,7 +171,7 @@ class Drone():
         #self.takeOffPosition.pose.position.x = self.motion_table.pose.position.x
         #self.takeOffPosition.pose.position.y = self.motion_table.pose.position.y
         #self.takeOffPosition.pose.position.z = self.motion_table.pose.position.z +1
-        print("Motion table x: {} y: {} z: {}".format(self.motion_table.pose.position.x, self.motion_table.pose.position.y, self.motion_table.pose.position.z))
+        #print("Motion table x: {} y: {} z: {}".format(self.motion_table.pose.position.x, self.motion_table.pose.position.y, self.motion_table.pose.position.z))
         self.counter=0        
         while self.counter < 300 or self.dist_to_target_thresh < dist_to_takeoff_pos:
             if self.start_time < 0:
@@ -182,27 +182,35 @@ class Drone():
             self.target_pos_pub.publish(self.takeOffPosition)
             self.cv_image = self.cam.get_img()
             success, dist_aruco, yaw, y_cor, x_cor, roll, pitch = self.aru.calc_euler(self.cv_image)
-            self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), '\n']))
+            #self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), '\n']))
             print("Distance to target1: ", dist_to_takeoff_pos)
-            #self.counter = self.counter + 1
+            self.counter = self.counter + 1
             self.rate.sleep()
-            if not self.state.mode == "OFFBOARD":
-                break
+            #if not self.state.mode == "OFFBOARD":
+                #break
+        
+        dist_to_takeoff_pos = 99999
+        #self.takeOffPosition.pose.position.z = self.altitude-1
+        pos_x = 0
+        pos_y = 0
+        self.counter = 0
+        while self.counter < 1500 or self.dist_to_target_thresh < dist_to_takeoff_pos:
+            self.cv_image = self.cam.get_img()
+            success, dist_aruco, yaw, y_cor, x_cor, roll, pitch = self.aru.calc_euler(self.cv_image)
+            pos_x = pos_x - y_cor*math.cos(drone_yaw)*0.003 + x_cor*math.sin(drone_yaw)*0.003
+            pos_y = pos_y - y_cor*math.sin(drone_yaw)*0.003 + x_cor*math.cos(drone_yaw)*0.003
+            self.takeOffPosition.pose.position.x = pos_x
+            self.takeOffPosition.pose.position.y = pos_y
+            header.stamp = rospy.Time.now()
+            self.takeOffPosition.header = header
+            self.target_pos_pub.publish(self.takeOffPosition)
+            dist_to_takeoff_pos = self.distanceToTarget(self.takeOffPosition)
+            self.f_v.write(','.join([str(x_cor),str(y_cor), str(time.time()- self.start_time), str(pos_x), str(pos_y), '\n']))
+            print("Distance to target2: ", dist_to_takeoff_pos)
+            self.counter = self.counter + 1
+            self.rate.sleep()
 
-        # dist_to_takeoff_pos = 99999
-        # self.takeOffPosition.pose.position.z = self.altitude-1
-        # self.counter = 0
-        # while self.counter < 300 or self.dist_to_target_thresh < dist_to_takeoff_pos:
-        #     header.stamp = rospy.Time.now()
-        #     self.takeOffPosition.header = header
-        #     self.target_pos_pub.publish(self.takeOffPosition)
-        #     dist_to_takeoff_pos = self.distanceToTarget(self.takeOffPosition)
-        #     self.cv_image = self.cam.get_img()
-        #     success, dist_aruco, yaw, y_cor, x_cor, roll, pitch = self.aru.calc_euler(self.cv_image)
-        #     self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), '\n']))
-        #     print("Distance to target2: ", dist_to_takeoff_pos)
-        #     self.counter = self.counter + 1
-        #     self.rate.sleep()
+        cv2.imwrite("xy_correction.jpg", self.cv_image)
 
         # dist_to_takeoff_pos = 99999
         # self.counter = 0
