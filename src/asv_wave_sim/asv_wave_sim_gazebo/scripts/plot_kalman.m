@@ -10,13 +10,14 @@ clear; clc;
 % v_pitch = importdata("log_pitch.txt");
 % v_dist = importdata("log_dist.txt");
 % v_roll = importdata("log_roll.txt");
-dist_test = importdata("dist_test_no_movement.txt");
+% dist_test = importdata("dist_test_no_movement.txt");
+xy_cor = importdata("log_v.txt")
 x = importdata("log_x.txt");
 %x(:,1) = [];
 %v(:,1) = [];
 %x(1:10,:) = [];
 %v(1,:) = [];
-dist_test(1:50,:)=[]
+%dist_test(1:50,:)=[]
 
 % figure(1)
 % subplot(2,3,1)
@@ -122,10 +123,17 @@ dist_test(1:50,:)=[]
 % 
 % max_error = max(abs(v_roll(:,2)-pi+0.3))
 
-figure(11)
+% figure(11)
+% hold on;
+% plot(dist_test(:,3), dist_test(:,1)+0.17) %Distance aruco marker
+% plot(dist_test(:,3), dist_test(:,2)) %Drones own position
+
+figure (12)
 hold on;
-plot(dist_test(:,3), dist_test(:,1)+0.17)
-plot(dist_test(:,3), dist_test(:,2))
+plot(xy_cor(:,3)-xy_cor(1,3), xy_cor(:,1)) %X_cor from aruco
+plot(xy_cor(:,3)-xy_cor(1,3), xy_cor(:,2)) %y_cor from aruco
+plot(xy_cor(:,3)-xy_cor(1,3), xy_cor(:,4)) %x_pos drone
+plot(xy_cor(:,3)-xy_cor(1,3), xy_cor(:,5)) %y_pos drone
 %%
 avg_dist_pos = mean(abs(v_pos_dist(1:800,3)-5))
 avg_dist_vel = mean(abs(v_vel_dist(1:800,3)-5))

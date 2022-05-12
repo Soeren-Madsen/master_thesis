@@ -213,7 +213,7 @@ class Drone():
             print("Distance to target2: ", dist_to_takeoff_pos)
             self.counter = self.counter + 1
             self.rate.sleep()
-
+        self.cv_image = self.cam.get_img()
         cv2.imwrite("xy_correction.jpg", self.cv_image)
 
         # dist_to_takeoff_pos = 99999
