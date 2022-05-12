@@ -11,7 +11,7 @@ clear; clc;
 % v_dist = importdata("log_dist.txt");
 % v_roll = importdata("log_roll.txt");
 % dist_test = importdata("dist_test_no_movement.txt");
-xy_cor = importdata("log_v.txt")
+xy_cor = importdata("xy_cor_pic.txt");
 x = importdata("log_x.txt");
 %x(:,1) = [];
 %v(:,1) = [];
