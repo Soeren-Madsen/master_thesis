@@ -3,9 +3,9 @@ import cv2.aruco as aruco
 
 # Create gridboard, which is a set of Aruco markers
 gridboard = aruco.GridBoard_create(
-        markersX=2, 
-        markersY=2, 
-        markerLength=0.04, 
+        markersX=3, 
+        markersY=3, 
+        markerLength=0.055, 
         markerSeparation=0.01, 
         dictionary=aruco.Dictionary_get(cv2.aruco.DICT_4X4_50))
 

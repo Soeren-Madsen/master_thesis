@@ -7,20 +7,19 @@ def filter_sbs():
 
     T = 60.5         # value taken in seconds
     n = int(60.5 * 12.4) # indicates total samples
-    t = np.linspace(0, T, 752, endpoint=False)
+    t = np.linspace(0, T, 1300, endpoint=False)
 
     #data = np.sin(1.2*2*np.pi*t) + 1.5*np.cos(9*2*np.pi*t) + 0.5*np.sin(12.0*2*np.pi*t)
     gt = []
     data = []
     ship = []
-    with open('log_pitch.txt') as f:
+    with open('log_v.txt') as f:
         csvreader = csv.reader(f)
         for row in csvreader:
             #gt.append(float(row[1]))
             #data.append(-float(row[3])-0.015)
-            gt.append(float(row[0])) #roll
-            data.append(float(row[2])-3.1415) #roll
-            ship.append(float(row[7])/20)
+            gt.append(float(row[3])) #roll
+            data.append(float(row[1])) #roll
 
     data = np.array(data)
     b,a = signal.butter(2, 0.35, fs=10)
@@ -30,11 +29,11 @@ def filter_sbs():
     result = zeros(data.size)
     for i, x in enumerate(data):
         result[i], z = signal.lfilter(b, a, [x], zi=z)
-    return result,gt,data,ship,t
+    return result,gt,data,t
 
 if __name__ == '__main__':
 
-    result,gt,data, ship,t = filter_sbs()
+    result,gt,data,t = filter_sbs()
     #plt.plot(t,data, label="Raw data")
     plt.plot(t,result, label = "Filtered pitch est")
     plt.plot(t,gt, label = "Ground truth")

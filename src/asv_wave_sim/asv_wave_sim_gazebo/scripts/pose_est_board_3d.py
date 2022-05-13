@@ -27,8 +27,8 @@ class Aruco_pose():
 
             #Works for x,y correction
             camera_calibration_parameters_filename = 'calibration_chessboard_gazebo.yaml'
-            aruco_marker_side_length = 0.455#0.66
-            aruco_marker_space = 0.09#0.066
+            aruco_marker_side_length = 0.58#0.455
+            aruco_marker_space = 0.11#0.09
 
             self.board = cv2.aruco.GridBoard_create(2, 2, aruco_marker_side_length, aruco_marker_space, self.arucoDict) #Gazebo
         else:
@@ -175,9 +175,9 @@ def main():
     
         ret, frame = cap.read()
         aru.calc_euler(frame)
-        cv2.imshow('frame', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        #cv2.imshow('frame', frame)
+        #if cv2.waitKey(1) & 0xFF == ord('q'):
+            #break
 
     
     # Close down the video stream
