@@ -27,8 +27,8 @@ class Aruco_pose():
 
             #Works for x,y correction
             camera_calibration_parameters_filename = 'calibration_chessboard_gazebo.yaml'
-            aruco_marker_side_length = 0.58#0.455
-            aruco_marker_space = 0.11#0.09
+            aruco_marker_side_length = 0.455
+            aruco_marker_space = 0.09
 
             self.board = cv2.aruco.GridBoard_create(2, 2, aruco_marker_side_length, aruco_marker_space, self.arucoDict) #Gazebo
         else:
