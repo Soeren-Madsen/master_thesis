@@ -209,16 +209,16 @@ class Drone():
             #pos_y = self.current_position.pose.position.y - y_cor*math.sin(0)*0.1 + x_cor*math.cos(0)*0.1
             #self.takeOffPosition.pose.position.x = pos_x
             #self.takeOffPosition.pose.position.y = pos_y
-            x = self.kf.future_predict(dist_aruco[0], self.current_position.pose.position.z)
-            sdf = self.kf.update_predict(dist_aruco[0], self.current_position.pose.position.z) #With predict above
-            #x = self.kf.update_predict(dist_aruco[0], self.current_position.pose.position.z) #Only kalman no predict
-            #self.takeOffPosition.pose.position.z = x[2] + 1
+            #x = self.kf.future_predict(dist_aruco[0], self.current_position.pose.position.z)
+            #sdf = self.kf.update_predict(dist_aruco[0], self.current_position.pose.position.z) #With predict above
+            x = self.kf.update_predict(dist_aruco[0], self.current_position.pose.position.z) #Only kalman no predict
+            self.takeOffPosition.pose.position.z = x[2] + 1
             header.stamp = rospy.Time.now()
             self.takeOffPosition.header = header
             self.target_pos_pub.publish(self.takeOffPosition)
             dist_to_takeoff_pos = self.distanceToTarget(self.takeOffPosition)
             #self.f_v.write(','.join([str(x_cor),str(y_cor), str(time.time()- self.start_time), str(pos_x), str(pos_y), '\n'])) #xy correction
-            self.f_v.write(','.join([str(dist_aruco),str(self.current_position.pose.position.z), str(time.time()- self.start_time), str(self.motion_table.pose.position.z), '\n'])) #Z dist
+            self.f_v.write(','.join([str(dist_aruco[0]),str(self.current_position.pose.position.z), str(time.time()- self.start_time), str(self.motion_table.pose.position.z), '\n'])) #Z dist
             #self.f_v.write(','.join([str(roll),str(pitch), str(time.time()- self.start_time), str(ori[0]), str(ori[1]),str(dist_aruco[0]), str(self.current_position.pose.position.z), str(self.motion_table.pose.position.z), '\n'])) #Combi
             self.f_x.write(','.join([str(x[0]),str(x[1]), str(time.time()- self.start_time), str(x[2]), str(x[3]), str(x[4]), '\n'])) #kalman
             print("Distance to target2: ", dist_to_takeoff_pos)

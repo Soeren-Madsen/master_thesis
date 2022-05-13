@@ -6,7 +6,7 @@ clear; clc;
 %v_vel_dist = importdata("log_v_vel_dist_3_wave.txt");
 %v_vel_dist_lp = importdata("log_v_vel_dist_lp_3_wave.txt");
 %v_vel_aruco = importdata("log_v_vel_aruco_3_wave.txt");
-%v_land = importdata("log_v_good_land.txt");
+%v_land = importdata("log_v_very_good_landing_5_predict.txt");
 % v_pitch = importdata("log_pitch.txt");
 % v_dist = importdata("log_dist.txt");
 % v_roll = importdata("log_roll.txt");
@@ -15,13 +15,19 @@ clear; clc;
 % dist_motion = importdata("dist_motion_no_delay.txt");
 % ori_motion = importdata("ori_motion.txt");
 % combi = importdata("combi.txt");
-kalman_no_movement = importdata("kalman_no_movement.txt");
-kalman_no_movement_gt = importdata("kalman_no_movement_gt.txt");
-
-kalman_no_movement(1:30,:) = [];
-kalman_no_movement(430:912,:) = [];
-kalman_no_movement_gt(1:30,:) = [];
-kalman_no_movement_gt(430:908,:) = [];
+% kalman_no_movement = importdata("kalman_no_movement.txt");
+% kalman_no_movement_gt = importdata("kalman_no_movement_gt.txt");
+kalman_no_movement_predict = importdata("kalman_no_movement_predict.txt")
+kalman_no_movement_predict_gt = importdata("kalman_no_movement_predict_gt.txt")
+% 
+% kalman_no_movement(1:30,:) = [];
+% kalman_no_movement(430:912,:) = [];
+% kalman_no_movement_gt(1:30,:) = [];
+% kalman_no_movement_gt(430:908,:) = [];
+kalman_no_movement_predict(1:30,:) = []
+kalman_no_movement_predict(700:1448,:) = []
+kalman_no_movement_predict_gt(1:30,:) = []
+kalman_no_movement_predict_gt(700:1380,:) = []
 %v(1,:) = [];
 %dist_test(1:50,:)=[]
 %ori_motion(800:1300,:)=[]
@@ -179,25 +185,46 @@ kalman_no_movement_gt(430:908,:) = [];
 % plot(combi(:,3)-combi(1,3), combi(:,6))
 % plot(combi(:,3)-combi(1,3), combi(:,7)-combi(:,8)-0.21)
 
-figure(16)
+% figure(16)
+% subplot(2,3,1)
+% %plot(kalman_no_movement(:,3)-kalman_no_movemet(1,3), kalman_no_movement(:,1))
+% hold on;
+% plot(kalman_no_movement(:,3)-kalman_no_movement(1,3), kalman_no_movement(:,1))
+% title('altitude drone')
+% subplot(2,3,2)
+% plot(kalman_no_movement(:,3)-kalman_no_movement(1,3), kalman_no_movement(:,2))
+% title('velocity drone')
+% subplot(2,3,3)
+% hold on;
+% plot(kalman_no_movement(:,3)-kalman_no_movement(1,3), kalman_no_movement(:,4)-0.21)
+% plot(kalman_no_movement_gt(:,3)-kalman_no_movement_gt(1,3), kalman_no_movement_gt(:,4))
+% title('altitude ship')
+% subplot(2,3,4)
+% plot(kalman_no_movement(:,3)-kalman_no_movement(1,3), kalman_no_movement(:,5))
+% title('velocity ship')
+% subplot(2,3,5)
+% plot(kalman_no_movement(:,3)-kalman_no_movement(1,3), kalman_no_movement(:,6))
+% title('acceleration ship')
+
+
+figure(17)
 subplot(2,3,1)
-%plot(kalman_no_movement(:,3)-kalman_no_movemet(1,3), kalman_no_movement(:,1))
 hold on;
-plot(kalman_no_movement(:,3)-kalman_no_movement(1,3), kalman_no_movement(:,1))
+plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,1))
 title('altitude drone')
 subplot(2,3,2)
-plot(kalman_no_movement(:,3)-kalman_no_movement(1,3), kalman_no_movement(:,2))
+plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,2))
 title('velocity drone')
 subplot(2,3,3)
 hold on;
-plot(kalman_no_movement(:,3)-kalman_no_movement(1,3), kalman_no_movement(:,4)-0.21)
-plot(kalman_no_movement_gt(:,3)-kalman_no_movement_gt(1,3), kalman_no_movement_gt(:,4))
+plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,4)-0.21)
+plot(kalman_no_movement_predict_gt(:,3)-kalman_no_movement_predict_gt(1,3), kalman_no_movement_predict_gt(:,4))
 title('altitude ship')
 subplot(2,3,4)
-plot(kalman_no_movement(:,3)-kalman_no_movement(1,3), kalman_no_movement(:,5))
+plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,5))
 title('velocity ship')
 subplot(2,3,5)
-plot(kalman_no_movement(:,3)-kalman_no_movement(1,3), kalman_no_movement(:,6))
+plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,6))
 title('acceleration ship')
 %%
 avg_dist_pos = mean(abs(v_pos_dist(1:800,3)-5))
