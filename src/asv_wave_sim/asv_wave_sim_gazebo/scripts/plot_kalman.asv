@@ -15,8 +15,8 @@ clear; clc;
 % dist_motion = importdata("dist_motion_no_delay.txt");
 % ori_motion = importdata("ori_motion.txt");
 % combi = importdata("combi.txt");
-kalman_no_movement = importdata("kalman_no_movement.txt");
-kalman_no_movement_gt = importdata("kalman_no_movement_gt.txt");
+kalman_no_movement = importdata("kalman_.txt");
+kalman_no_movement_gt = importdata("log_v.txt");
 
 kalman_no_movement(1:30,:) = [];
 kalman_no_movement(430:912,:) = [];
