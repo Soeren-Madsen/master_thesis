@@ -66,7 +66,7 @@ class Kalman_est():
 
     def future_predict(self, dist, drone_alt):
         kal = copy.deepcopy(self.f)
-        for i in range(7):
+        for i in range(8):
             kal.predict()
             #print("x[2] number {}: {}".format(i, self.f.x[2]))
             #print("Ship vel kalman: ", kal.x[3])

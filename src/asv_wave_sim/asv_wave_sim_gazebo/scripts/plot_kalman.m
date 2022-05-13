@@ -21,8 +21,10 @@ clear; clc;
 % kalman_no_movement_predict_gt = importdata("kalman_no_movement_predict_gt.txt")
 % kalman_movement = importdata("kalman_movement.txt");
 % kalman_movement_gt = importdata("kalman_movement_gt.txt");
-kalman_movement_6_predict = importdata("kalman_movement_6_predict.txt")
-kalman_movement_6_predict_gt = importdata("kalman_movement_6_predict_gt.txt")
+% kalman_movement_6_predict = importdata("kalman_movement_6_predict.txt")
+% kalman_movement_6_predict_gt = importdata("kalman_movement_6_predict_gt.txt")
+kalman_movement_6_predict = importdata("kalman_movement_7_predict.txt")
+kalman_movement_6_predict_gt = importdata("kalman_movement_7_predict_gt.txt")
 % 
 % kalman_no_movement(1:30,:) = [];
 % kalman_no_movement(430:912,:) = [];
@@ -36,10 +38,14 @@ kalman_movement_6_predict_gt = importdata("kalman_movement_6_predict_gt.txt")
 % kalman_movement(1000:1591,:) = [];
 % kalman_movement_gt(1:30,:) = [];
 % kalman_movement_gt(1000:1596,:) = [];
+% kalman_movement_6_predict(1:30,:) = [];
+% kalman_movement_6_predict(1000:1532,:) = [];
+% kalman_movement_6_predict_gt(1:30,:) = [];
+% kalman_movement_6_predict_gt(1000:1592,:) = [];
 kalman_movement_6_predict(1:30,:) = [];
-kalman_movement_6_predict(1000:1532,:) = [];
+kalman_movement_6_predict(1000:1401,:) = [];
 kalman_movement_6_predict_gt(1:30,:) = [];
-kalman_movement_6_predict_gt(1000:1592,:) = [];
+kalman_movement_6_predict_gt(1000:1377,:) = [];
 
 %v(1,:) = [];
 %dist_test(1:50,:)=[]
