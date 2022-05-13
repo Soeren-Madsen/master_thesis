@@ -48,7 +48,7 @@ class Kalman_est():
         
 
     def init_guess(self, drone_alt):
-        self.f.x = np.array([drone_alt, 0., 0, 1.5, 0])   #Initial guess of states
+        self.f.x = np.array([drone_alt, 0., 0, 1.78, 0])   #Initial guess of states
 
     def update_control_sig(self,acc):
         self.u = np.array([acc])

@@ -13,14 +13,16 @@ clear; clc;
 % dist_test = importdata("dist_test_no_movement.txt");
 % xy_cor = importdata("xy_cor_pic.txt");
 % dist_motion = importdata("dist_motion_no_delay.txt")
-ori_motion = importdata("log_v.txt")
-x = importdata("log_x.txt");
+% ori_motion = importdata("ori_motion.txt")
+combi = importdata("combi.txt")
+% x = importdata("log_x.txt");
 %x(:,1) = [];
 %v(:,1) = [];
 %x(1:10,:) = [];
 %v(1,:) = [];
 %dist_test(1:50,:)=[]
-ori_motion(800:1300,:)=[]
+%ori_motion(800:1300,:)=[]
+combi(1000:1408,:)=[]
 
 % figure(1)
 % subplot(2,3,1)
@@ -143,18 +145,36 @@ ori_motion(800:1300,:)=[]
 % plot(dist_motion(:,3)-dist_motion(1,3), dist_motion(:,1)+0.21) %Distance aruco marker
 % plot(dist_motion(:,3)-dist_motion(1,3), dist_motion(:,2)-dist_motion(:,4)) %Ground truth
 
-for i=1:length(ori_motion)
-    if ori_motion(i,1) < 0
-        ori_motion(i,1)=ori_motion(i,1)+2*pi;
+% for i=1:length(ori_motion)
+%     if ori_motion(i,1) < 0
+%         ori_motion(i,1)=ori_motion(i,1)+2*pi;
+%     end
+% end
+
+% figure(14)
+% hold on;
+% plot(ori_motion(:,3)-ori_motion(1,3), ori_motion(:,2)) %pitch est
+% plot(ori_motion(:,3)-ori_motion(1,3), ori_motion(:,1)-3.1) %Roll est
+% plot(ori_motion(:,3)-ori_motion(1,3), ori_motion(:,5)) %Roll gt
+% plot(ori_motion(:,3)-ori_motion(1,3), ori_motion(:,4)) %pitch gt
+
+for i=1:length(combi)
+    if combi(i,1) < 0
+        combi(i,1)=combi(i,1)+2*pi;
     end
 end
 
 figure(14)
 hold on;
-%plot(ori_motion(:,3)-ori_motion(1,3), ori_motion(:,2)) %pitch est
-plot(ori_motion(:,3)-ori_motion(1,3), ori_motion(:,1)-3.1) %Roll est
-plot(ori_motion(:,3)-ori_motion(1,3), ori_motion(:,5)) %Roll gt
-%plot(ori_motion(:,3)-ori_motion(1,3), ori_motion(:,4)) %pitch gt
+plot(combi(:,3)-combi(1,3), combi(:,2)) %pitch est
+plot(combi(:,3)-combi(1,3), combi(:,1)-3.1) %Roll est
+plot(combi(:,3)-combi(1,3), combi(:,5)) %Roll gt
+plot(combi(:,3)-combi(1,3), combi(:,4)) %pitch gt
+
+figure(15)
+hold on;
+plot(combi(:,3)-combi(1,3), combi(:,6))
+plot(combi(:,3)-combi(1,3), combi(:,7)-combi(:,8)-0.21)
 %%
 avg_dist_pos = mean(abs(v_pos_dist(1:800,3)-5))
 avg_dist_vel = mean(abs(v_vel_dist(1:800,3)-5))
