@@ -209,7 +209,7 @@ class Drone():
             #pos_y = self.current_position.pose.position.y - y_cor*math.sin(0)*0.1 + x_cor*math.cos(0)*0.1
             #self.takeOffPosition.pose.position.x = pos_x
             #self.takeOffPosition.pose.position.y = pos_y
-            x = self.kf.future_predict(dist_aruco[0], self.current_position.pose.position.z)
+            x = self.kf.update_predict(dist_aruco[0], self.current_position.pose.position.z)
             header.stamp = rospy.Time.now()
             self.takeOffPosition.header = header
             self.target_pos_pub.publish(self.takeOffPosition)
