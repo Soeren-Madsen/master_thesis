@@ -17,17 +17,27 @@ clear; clc;
 % combi = importdata("combi.txt");
 % kalman_no_movement = importdata("kalman_no_movement.txt");
 % kalman_no_movement_gt = importdata("kalman_no_movement_gt.txt");
-kalman_no_movement_predict = importdata("kalman_no_movement_predict.txt")
-kalman_no_movement_predict_gt = importdata("kalman_no_movement_predict_gt.txt")
+% kalman_no_movement_predict = importdata("kalman_no_movement_predict.txt")
+% kalman_no_movement_predict_gt = importdata("kalman_no_movement_predict_gt.txt")
+% kalman_movement = importdata("kalman_movement.txt");
+% kalman_movement_gt = importdata("kalman_movement_gt.txt");
+kalman_movement = importdata("log_x.txt")
+kalman_movement_gt = importdata("log_v.txt")
 % 
 % kalman_no_movement(1:30,:) = [];
 % kalman_no_movement(430:912,:) = [];
 % kalman_no_movement_gt(1:30,:) = [];
 % kalman_no_movement_gt(430:908,:) = [];
-kalman_no_movement_predict(1:30,:) = []
-kalman_no_movement_predict(700:1448,:) = []
-kalman_no_movement_predict_gt(1:30,:) = []
-kalman_no_movement_predict_gt(700:1380,:) = []
+% kalman_no_movement_predict(1:30,:) = []
+% kalman_no_movement_predict(700:1448,:) = []
+% kalman_no_movement_predict_gt(1:30,:) = []
+% kalman_no_movement_predict_gt(700:1380,:) = []
+% kalman_movement(1:30,:) = [];
+% kalman_movement(1000:1591,:) = [];
+% kalman_movement_gt(1:28,:) = [];
+% kalman_movement_gt(1000:1598,:) = [];
+kalman_movement_gt(1:32,:) = []
+kalman_movement(1:20,:) = []
 %v(1,:) = [];
 %dist_test(1:50,:)=[]
 %ori_motion(800:1300,:)=[]
@@ -207,24 +217,45 @@ kalman_no_movement_predict_gt(700:1380,:) = []
 % title('acceleration ship')
 
 
-figure(17)
+% figure(17)
+% subplot(2,3,1)
+% hold on;
+% plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,1))
+% title('altitude drone')
+% subplot(2,3,2)
+% plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,2))
+% title('velocity drone')
+% subplot(2,3,3)
+% hold on;
+% plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,4)-0.21)
+% plot(kalman_no_movement_predict_gt(:,3)-kalman_no_movement_predict_gt(1,3), kalman_no_movement_predict_gt(:,4))
+% title('altitude ship')
+% subplot(2,3,4)
+% plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,5))
+% title('velocity ship')
+% subplot(2,3,5)
+% plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,6))
+% title('acceleration ship')
+
+figure(18)
 subplot(2,3,1)
 hold on;
-plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,1))
+plot(kalman_movement(:,3)-kalman_movement(1,3), kalman_movement_gt(:,2))
+plot(kalman_movement_gt(:,3)-kalman_movement_gt(1,3), kalman_movement_gt(:,4))%+1+0.21)
 title('altitude drone')
 subplot(2,3,2)
-plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,2))
+plot(kalman_movement(:,3)-kalman_movement(1,3), kalman_movement(:,2))
 title('velocity drone')
 subplot(2,3,3)
 hold on;
-plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,4)-0.21)
-plot(kalman_no_movement_predict_gt(:,3)-kalman_no_movement_predict_gt(1,3), kalman_no_movement_predict_gt(:,4))
+plot(kalman_movement(:,3)-kalman_movement(1,3), kalman_movement(:,4)+6.6)%-0.21)
+plot(kalman_movement_gt(:,3)-kalman_movement_gt(1,3), kalman_movement_gt(:,4))
 title('altitude ship')
 subplot(2,3,4)
-plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,5))
+plot(kalman_movement(:,3)-kalman_movement(1,3), kalman_movement(:,5))
 title('velocity ship')
 subplot(2,3,5)
-plot(kalman_no_movement_predict(:,3)-kalman_no_movement_predict(1,3), kalman_no_movement_predict(:,6))
+plot(kalman_movement(:,3)-kalman_movement(1,3), kalman_movement(:,6))
 title('acceleration ship')
 %%
 avg_dist_pos = mean(abs(v_pos_dist(1:800,3)-5))

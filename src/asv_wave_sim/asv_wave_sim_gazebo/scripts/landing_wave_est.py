@@ -291,17 +291,17 @@ class Drone():
                 self.kf.check_time()
                 
                 #targetPosition.pose.position.z = x[2] + self.altitude
-                targetPosition.position.z = 0#x[2] + self.altitude
+                targetPosition.position.z = x[2] + self.altitude
                 #print("Kalman vel: ", x[3])
                 #print("ship vel: ", model_ship.twist.linear.z)
 
                 st, self.z = signal.lfilter(self.b, 1, [x[3]], zi=self.z)
                 
                 #targetPosition.velocity.z = x[3] #No low pass filter
-                targetPosition.velocity.z = 0#st[0] #With low pass filter
-                self.last_ship_alt = 0#x[2]
+                targetPosition.velocity.z = st[0] #With low pass filter
+                self.last_ship_alt = x[2]
 
-                self.f_x.write(','.join([str(x[0]), str(x[1]), str(x[2]), str(x[3]), str(x[4]), '\n']))
+                #self.f_x.write(','.join([str(x[0]), str(x[1]), str(x[2]), str(x[3]), str(x[4]), '\n']))
                 if self.gazebo:
                     ship_alt = model_ship.pose.position.z
                 else:
@@ -331,9 +331,10 @@ class Drone():
                 #self.f_v.write(','.join([str(model_drone.pose.position.z), str(model_ship.pose.position.z), str(dist_aruco[0]), str(time.time()- self.start_time), str(x[1]), '\n']))
                 roll_gt, pitch_gt, yaw_gt = self.aru.euler_from_quaternion(model_ship.pose.orientation.x, model_ship.pose.orientation.y, model_ship.pose.orientation.z, model_ship.pose.orientation.w)
                 roll_drone, pitch_drone, yaw_drone = self.aru.euler_from_quaternion(model_drone.pose.orientation.x, model_drone.pose.orientation.y, model_drone.pose.orientation.z, model_drone.pose.orientation.w)
-                self.f_v.write(','.join([str(roll_gt), str(roll_lp[0]), str(roll), str(time.time()- self.start_time), '\n']))
+                #self.f_v.write(','.join([str(roll_gt), str(roll_lp[0]), str(roll), str(time.time()- self.start_time), '\n']))
                 #self.f_v.write(','.join([str(dist), str(dist_aruco[0]), str(time.time()- self.start_time), '\n']))
-                
+                self.f_v.write(','.join([str(dist_aruco[0]),str(self.current_position.pose.position.z), str(time.time()- self.start_time), str(model_ship.pose.position.z), '\n'])) #Z dist
+                self.f_x.write(','.join([str(x[0]),str(x[1]), str(time.time()- self.start_time), str(x[2]), str(x[3]), str(x[4]), '\n'])) #kalman
                 #if self.counter > 300:# and ship_alt < 0.9*self.max_alt_ship:
                 #    self.allow_landing = True
                     
