@@ -24,12 +24,16 @@ predict_times = int(1/dt)
 class Kalman_est():
     def __init__(self):
         self.dt = dt
-        self.A = np.array([[1, self.dt, 0, 0, 0], [0, 1, 0, 0, 0,], [0, 0, 1, self.dt, 1/2*self.dt**2], [0, 0, 0, 1, self.dt], [0, 0, 0, 0, 1]])
+        self.A = np.array([[1, self.dt, 0, 0, 0,0,0,0,0,0,0,0,0,0,0], [0, 1, 0, 0, 0,0,0,0,0,0,0,0,0,0,0], [0, 0, 1, self.dt, 1/2*self.dt**2,0,0,0,0,0,0,0,0,0,0], \
+            [0, 0, 0, 1, self.dt,0,0,0,0,0,0,0,0,0,0], [0, 0, 0, 0, 1,0,0,0,0,0,0,0,0,0,0], \
+            [1, 0, 0, 0, 0,0,0,0,0,0,0,0,0,0,0],[0, 1, 0, 0, 0,0,0,0,0,0,0,0,0,0,0],[0, 0, 1, 0, 0,0,0,0,0,0,0,0,0,0,0],\
+            [0, 0, 0, 1, 0,0,0,0,0,0,0,0,0,0,0],[0, 0, 0, 0, 1,0,0,0,0,0,0,0,0,0,0],[0, 0, 0, 0, 0,1,0,0,0,0,0,0,0,0,0],\
+            [0, 0, 0, 0, 0,0,1,0,0,0,0,0,0,0,0],[0, 0, 0, 0, 0,0,0,1,0,0,0,0,0,0,0],[0, 0, 0, 0, 0,0,0,0,1,0,0,0,0,0,0],[0, 0, 0, 0, 0,0,0,0,0,1,0,0,0,0,0],])
         #self.B = np.array([[1/2*self.dt**2], [self.dt], [0], [0], [0]])
-        self.B = np.array([[0], [0], [0], [0], [0]])
-        self.C = np.array([[1, 0, -1, 0, 0], [1, 0, 0, 0, 0]])
+        self.B = np.array([[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0],[0]])
+        self.C = np.array([[0, 0, 0, 0, 0,0,0,0,0,0,1,0,-1,0,0], [1, 0, 0, 0, 0,0,0,0,0,0,0,0,0,0,0]])
         self.D = 0
-        self.f = KalmanFilter (dim_x=5, dim_z=2)
+        self.f = KalmanFilter (dim_x=15, dim_z=2)
         self.f.F = self.A #A matrix
         self.f.H = self.C #C matrix
         #print(self.f.P)
@@ -38,7 +42,11 @@ class Kalman_est():
         #self.f.P *= 1000. #Initial covariance
         self.f.B = self.B
         self.f.R = np.array([[0.1, 0],[0,0.1]])
-        self.f.Q = np.array([[self.dt**4/4, self.dt**3/2, 0, 0, 0],[self.dt**3/2, self.dt**2, 0, 0, 0], [0, 0, self.dt**4/4, self.dt**3/2, self.dt**2/2], [0, 0, self.dt**3/2, self.dt**2, self.dt], [0, 0, self.dt**2/2, self.dt, 1]])
+        self.f.Q = np.array([[self.dt**4/4, self.dt**3/2, 0, 0, 0,0,0,0,0,0,0,0,0,0,0],[self.dt**3/2, self.dt**2, 0, 0, 0,0,0,0,0,0,0,0,0,0,0], \
+            [0, 0, self.dt**4/4, self.dt**3/2, self.dt**2/2,0,0,0,0,0,0,0,0,0,0], [0, 0, self.dt**3/2, self.dt**2, self.dt,0,0,0,0,0,0,0,0,0,0], \
+            [0, 0, self.dt**2/2, self.dt, 1,0,0,0,0,0,0,0,0,0,0], [0,0,0,0,0,self.dt**4/4, self.dt**3/2,0,0,0,0,0,0,0,0], [0,0,0,0,0,self.dt**3/2, self.dt**2,0,0,0,0,0,0,0,0], \
+            [0,0,0,0,0,0,0,self.dt**4/4, self.dt**3/2, self.dt**2/2,0,0,0,0,0],[0,0,0,0,0,0,0,self.dt**3/2, self.dt**2, self.dt,0,0,0,0,0],[0,0,0,0,0,0,0,self.dt**2/2, self.dt, 1,0,0,0,0,0],[0,0,0,0,0,0,0,0,0,0,self.dt**4/4, self.dt**3/2,0,0,0], \
+            [0,0,0,0,0,0,0,0,0,0,self.dt**3/2, self.dt**2,0,0,0],[0,0,0,0,0,0,0,0,0,0,0,0,self.dt**4/4, self.dt**3/2, self.dt**2/2],[0,0,0,0,0,0,0,0,0,0,0,0,self.dt**3/2, self.dt**2, self.dt],[0,0,0,0,0,0,0,0,0,0,0,0,self.dt**2/2, self.dt, 1]])
         self.f.Q *= 3**2
         #self.f.Q = np.array([[1000, 0, 0, 0, 0],[0, 1000, 0, 0, 0], [0, 0, 1000, 0, 0], [0, 0, 0, 3000, 0], [0, 0, 0, 0, 9000]])
         self.u = 0
@@ -48,7 +56,7 @@ class Kalman_est():
         
 
     def init_guess(self, drone_alt):
-        self.f.x = np.array([drone_alt, 0., 0, 1.78, 0])   #Initial guess of states
+        self.f.x = np.array([drone_alt, 0., 0, 1.78, 0,0,0,0,0,0,0,0,0,0,0])   #Initial guess of states
 
     def update_control_sig(self,acc):
         self.u = np.array([acc])

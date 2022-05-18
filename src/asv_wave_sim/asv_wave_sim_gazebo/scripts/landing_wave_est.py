@@ -283,9 +283,9 @@ class Drone():
                 #print("Dist dif: ", dist_aruco[0] - dist)
                 #print("Altitude of drone: ", self.current_position.pose.position.z)
                 #x = self.kf.update_predict(dist_aruco[0], self.current_position.pose.position.z)
-                #x = self.kf.update_predict(dist, self.current_position.pose.position.z)
-                x = self.kf.future_predict(dist, self.current_position.pose.position.z)
-                sdf = self.kf.update_predict(dist, self.current_position.pose.position.z)
+                x = self.kf.update_predict(dist, self.current_position.pose.position.z)
+                # x = self.kf.future_predict(dist, self.current_position.pose.position.z)
+                # sdf = self.kf.update_predict(dist, self.current_position.pose.position.z)
                 if self.start_time < 0:
                     self.start_time = time.time()
                 self.kf.check_time()
@@ -393,7 +393,7 @@ class Drone():
         resp = self.set_state(state_msg)
 
     def reset_link(self, roll, pitch):
-        ori = self.quaternion_from_euler(roll, pitch, 0.0)
+        ori = self.quaternion_from_euler(pitch, -roll, 0.0)
         link_msg = LinkState()
         link_msg.link_name = 'sdu_master::landing::landing_gear'
         #link_msg.pose.position.x = 0
