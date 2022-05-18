@@ -17,7 +17,7 @@ from math import sqrt, degrees, radians, fmod
 from sensor_msgs.msg import NavSatFix, Imu, Image
 from pose_est_board_3d import Aruco_pose
 from ros_cam import Cam
-from kalman_ship import Kalman_est #Change to kalman_delay instead of kalman_ship for new kalman filter
+from kalman_delay import Kalman_est #Change to kalman_delay instead of kalman_ship for new kalman filter
 
 class Drone():
     def __init__(self, arg = False):
