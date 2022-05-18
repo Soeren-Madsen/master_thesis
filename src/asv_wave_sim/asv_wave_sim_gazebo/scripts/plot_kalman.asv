@@ -65,7 +65,7 @@ kalman_sim = importdata("log_x.txt")
 % ori_motion(800:1300,:)=[]
 % combi(1000:1408,:)=[]
 kalman_sim_gt(844:862,:) = []
-kalman_sim_vel(647:703,:) = []
+kalman_sim_vel(:703,:) = []
 
 % figure(1)
 % subplot(2,3,1)
@@ -345,11 +345,11 @@ xlabel({'Time [s]'});
 % plot(kalman_movement_6_predict(:,3)-kalman_movement_6_predict(1,3), kalman_movement_6_predict(:,6))
 % title('acceleration ship')
 
-error = abs(kalman_sim_gt(:,2)-(kalman_sim_gt(:,4)-0.8));
+error = abs(kalman_sim_gt(:,2)-(kalman_sim_gt(:,4)-0.8))
 mu = mean(error)
-max_pos = max(error)
-std_pos = std(error)
-error_vel = abs(kalman_sim_vel_gt(:,2)-(kalman_sim_vel_gt(:,4)-0.8));
+max = max(error)
+std = std(error)
+error_vel = abs(kalman_sim_gt(:,2)-(kalman_sim_gt(:,4)-0.8))
 mu_vel = mean(error_vel)
 max_vel = max(error_vel)
 std_vel = std(error_vel)
