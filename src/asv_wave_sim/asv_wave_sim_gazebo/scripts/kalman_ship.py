@@ -19,7 +19,6 @@ freq3 = 0.5
 
 drone_al = 10
 
-predict_times = int(1/dt)
 
 class Kalman_est():
     def __init__(self):
@@ -30,17 +29,12 @@ class Kalman_est():
         self.C = np.array([[1, 0, -1, 0, 0], [1, 0, 0, 0, 0]])
         self.D = 0
         self.f = KalmanFilter (dim_x=5, dim_z=2)
-        self.f.F = self.A #A matrix
-        self.f.H = self.C #C matrix
-        #print(self.f.P)
-        #self.f.P = np.array([[1., 1., 0., 0., 0.],[1., 1., 0., 0., 0.], [0.,0.,1.,1.,1.],[0.,0.,1.,1.,1.],[0.,0.,1.,1.,1.]])
-        #print(self.f.P)
-        #self.f.P *= 1000. #Initial covariance
+        self.f.F = self.A 
+        self.f.H = self.C 
         self.f.B = self.B
         self.f.R = np.array([[0.1, 0],[0,0.1]])
         self.f.Q = np.array([[self.dt**4/4, self.dt**3/2, 0, 0, 0],[self.dt**3/2, self.dt**2, 0, 0, 0], [0, 0, self.dt**4/4, self.dt**3/2, self.dt**2/2], [0, 0, self.dt**3/2, self.dt**2, self.dt], [0, 0, self.dt**2/2, self.dt, 1]])
         self.f.Q *= 3**2
-        #self.f.Q = np.array([[1000, 0, 0, 0, 0],[0, 1000, 0, 0, 0], [0, 0, 1000, 0, 0], [0, 0, 0, 3000, 0], [0, 0, 0, 0, 9000]])
         self.u = 0
         self.prev_time = time.time()
         self.max_vel = 0
@@ -112,7 +106,7 @@ if __name__ == '__main__':
     
 
     for z in z_vec:
-        #kf.update_control_sig()
+        #kf.update_control_sig(0)
         #x = kf.future_predict(z, drone_al)
         x = kf.update_predict(z, drone_al)
         x_vec_4.append(x[3])

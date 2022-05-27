@@ -22,7 +22,7 @@ zd_hat = zd(t0,freq, A) + zd(t0,freq2, A2) + zd(t0,freq3, A3);
 zd_dot_hat = zd_dot(t0,freq, A) + zd_dot(t0,freq2, A2) + zd_dot(t0,freq3, A3);
 
 %Trajectory time calculation:
-zrmax_ddot = 1;
+zrmax_ddot = 2;
 zrmax_dot = 2;
 za = z_t0 - zd_hat;
 za_dot = z_dot_t0 - (zd_dot_hat);

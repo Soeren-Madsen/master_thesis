@@ -1,11 +1,11 @@
 #!/usr/bin/env python
   
   
-from __future__ import print_function # Python 2/3 compatibility
-import cv2 # Import the OpenCV library
-import numpy as np # Import Numpy library
+from __future__ import print_function 
+import cv2 
+import numpy as np
 from scipy.spatial.transform import Rotation as R
-import math # Math library
+import math 
 import time
 
 
@@ -14,8 +14,6 @@ class Aruco_pose():
     def __init__(self, gazebo):
         self.gazebo = gazebo
         # Side length of the ArUco marker in meters 
-        #aruco_marker_side_length =0.092  #0.097 in gazebo #0.055 real life
-        #aruco_marker_space = 0.01 #0.025 in gazebo #0.014 real life
         self.arucoDict = cv2.aruco.Dictionary_get(cv2.aruco.DICT_4X4_50)
         self.arucoParams = cv2.aruco.DetectorParameters_create() 
         # Calibration parameters yaml file
@@ -138,7 +136,7 @@ class Aruco_pose():
                         #self.roll_x = math.degrees(self.roll_x)
                         #self.pitch_y = math.degrees(self.pitch_y)
                         self.yaw_z = math.degrees(self.yaw_z)
-                        print("transform_translation_x: {}".format(self.transform_translation_x))
+                        #print("transform_translation_x: {}".format(self.transform_translation_x))
                         #print("transform_translation_y: {}".format(self.transform_translation_y))
                         #print("transform_translation_z: {}".format(self.transform_translation_z))
                         #print("roll_x: {}".format(self.roll_x))

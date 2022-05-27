@@ -60,7 +60,7 @@
 
 
 <!--add imu-->
-        <link name="imu_link">
+        <!--link name="imu_link">
           <pose>0 0 0 0 0 0</pose>
           <collision name="collision">
             <pose>0 0 0.3 0 0 0</pose>
@@ -78,9 +78,9 @@
                <ixz>0</ixz>
                <iyy>0.0001</iyy>
                <iyz>0</iyz>
-               <izz>0.0001</izz>
+               <izz>0.0001</izz-->
                <!-- low intertia necessary to avoid not disturb the ship -->
-            </inertia>
+            <!--/inertia>
           </inertial>
 
       <sensor name="imu_sensor" type="imu">
@@ -106,7 +106,7 @@
           <pose>0 0 0 0 0 0</pose>
           <parent>base_link</parent>
           <child>imu_link</child>
-        </joint>
+        </joint-->
 
 <static>1</static>
 <link name="world_link">

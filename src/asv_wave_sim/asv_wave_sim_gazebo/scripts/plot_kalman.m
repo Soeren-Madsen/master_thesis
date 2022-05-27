@@ -6,7 +6,7 @@ clear; clc; format compact;
 %v_vel_dist = importdata("log_v_vel_dist_3_wave.txt");
 %v_vel_dist_lp = importdata("log_v_vel_dist_lp_3_wave.txt");
 % v_vel_aruco = importdata("log_v_vel_aruco_3_wave.txt");
-%v_land = importdata("log_v_very_good_landing_5_predict.txt");
+v_land = importdata("log_v_very_good_landing_5_predict.txt");
 % v_pitch = importdata("log_pitch.txt");
 % v_dist = importdata("log_dist.txt");
 % v_roll = importdata("log_roll.txt");
@@ -28,10 +28,12 @@ clear; clc; format compact;
 % kalman_movement_6_predict_gt = importdata("kalman_movement_7_predict_gt.txt");
 % kalman_movement_6_predict = importdata("kalman_movement_8_predict.txt");
 % kalman_movement_6_predict_gt = importdata("kalman_movement_8_predict_gt.txt");
-kalman_sim_vel_gt = importdata("kalman_sim_gt.txt")
-kalman_sim_vel = importdata("kalman_sim.txt")
-kalman_sim_gt = importdata("log_v.txt")
-kalman_sim = importdata("log_x.txt")
+% kalman_movement_6_predict = importdata("new_kalman_states.txt");
+% kalman_movement_6_predict_gt = importdata("new_kalman_gt.txt");
+% kalman_sim_vel_gt = importdata("kalman_sim_gt.txt")
+% kalman_sim_vel = importdata("kalman_sim.txt")
+% kalman_sim_gt = importdata("log_v.txt")
+% kalman_sim = importdata("log_x.txt")
 % 
 % kalman_no_movement(1:30,:) = [];
 % kalman_no_movement(430:912,:) = [];
@@ -60,12 +62,18 @@ kalman_sim = importdata("log_x.txt")
 % kalman_movement_6_predict_gt(1:30,:) = [];
 % kalman_movement_6_predict_gt(500:833,:) = [];
 
+% kalman_movement_6_predict(1:30,:) = [];
+% kalman_movement_6_predict(700:1136,:) = [];
+% kalman_movement_6_predict_gt(1:30,:) = [];
+% kalman_movement_6_predict_gt(700:1161,:) = [];
+
 %v(1,:) = [];
 % dist_test(1:50,:)=[]
 % ori_motion(800:1300,:)=[]
 % combi(1000:1408,:)=[]
-kalman_sim_gt(844:862,:) = []
-kalman_sim_vel(647:703,:) = []
+% kalman_sim_gt(844:862,:) = []
+% kalman_sim_vel(647:703,:) = []
+
 
 % figure(1)
 % subplot(2,3,1)
@@ -150,7 +158,7 @@ kalman_sim_vel(647:703,:) = []
 % figure(8)
 % plot(v_land(:,1))
 % hold on;
-% plot(v_land(:,2)-6)
+% plot(v_land(:,2))
 % legend('drone pos', 'ship pos')
 
 % figure(9)
@@ -317,27 +325,27 @@ kalman_sim_vel(647:703,:) = []
 % plot(kalman_movement_6_predict(:,3)-kalman_movement_6_predict(1,3), kalman_movement_6_predict(:,6))
 % title('acceleration ship')
 
-figure(20)
-%subplot(3,1,1)
-hold on;
-plot(kalman_sim(:,3)-kalman_sim(1,3), kalman_sim_gt(:,2))
-plot(kalman_sim_gt(:,3)-kalman_sim_gt(1,3), kalman_sim_gt(:,4)-0.8)
-title('Altitude drone and altitude ship')
-ylabel({'Height [m]'});
-xlabel({'Time [s]'});
-%subplot(3,1,3)
+% figure(20)
+% %subplot(3,1,1)
+% hold on;
+% plot(kalman_sim(:,3)-kalman_sim(1,3), kalman_sim_gt(:,2))
+% plot(kalman_sim_gt(:,3)-kalman_sim_gt(1,3), kalman_sim_gt(:,4)-0.8)
+% title('Altitude drone and altitude ship')
+% ylabel({'Height [m]'});
+% xlabel({'Time [s]'});
+% subplot(3,1,3)
 % plot(kalman_sim(:,3)-kalman_sim(1,3), kalman_sim(:,2))
 % title('velocity drone')
 % xlabel({'Time [s]'});
 % ylabel({'Velocity [m/s]'});
-% %subplot(3,1,2)
+%subplot(3,1,2)
 % hold on;
 % plot(kalman_sim(:,3)-kalman_sim(1,3), kalman_sim(:,4)+6.7)
 % plot(kalman_sim_gt(:,3)-kalman_sim_gt(1,3), kalman_sim_gt(:,4) )
 % title('Altitude ship and kalman estimate')
 % ylabel({'Height [m]'});
 % xlabel({'Time [s]'});
-% 
+
 % subplot(2,3,4)
 % plot(kalman_movement_6_predict(:,3)-kalman_movement_6_predict(1,3), kalman_movement_6_predict(:,5))
 % title('velocity ship')
@@ -345,10 +353,10 @@ xlabel({'Time [s]'});
 % plot(kalman_movement_6_predict(:,3)-kalman_movement_6_predict(1,3), kalman_movement_6_predict(:,6))
 % title('acceleration ship')
 
-error = abs(kalman_sim_gt(:,2)-(kalman_sim_gt(:,4)-0.8));
-mu = mean(error)
-max_pos = max(error)
-std_pos = std(error)
+% error = abs(kalman_sim_gt(:,2)-(kalman_sim_gt(:,4)-0.8));
+% mu = mean(error)
+% max_pos = max(error)
+% std_pos = std(error)
 error_vel = abs(kalman_sim_vel_gt(:,2)-(kalman_sim_vel_gt(:,4)-0.8));
 mu_vel = mean(error_vel)
 max_vel = max(error_vel)
